@@ -6,12 +6,15 @@
     function resolveDashboardRole(role) {
         const roleValue = role && typeof role === 'object' && 'role' in role ? role.role : role;
         const normalized = normalizeRole(roleValue);
+        if (normalized === 'administrator') return 'admin';
+        if (normalized === 'donor') return 'sponsor';
+        if (normalized === 'member') return 'volunteer';
         return ['admin', 'sponsor', 'volunteer'].includes(normalized) ? normalized : 'admin';
     }
 
     function persistAuthSession(token, user) {
         if (!token || !user) return null;
-        const normalizedUser = {...user, role: resolveDashboardRole(user?.role) };
+        const normalizedUser = {...user, role: resolveDashboardRole(user ? .role) };
         localStorage.setItem('madiva_token', token);
         localStorage.setItem('madiva_user', JSON.stringify(normalizedUser));
         return { token, user: normalizedUser };
@@ -30,7 +33,7 @@
 
         return {
             token,
-            user: user ? {...user, role: resolveDashboardRole(user?.role) } : null,
+            user: user ? {...user, role: resolveDashboardRole(user ? .role) } : null,
         };
     }
 

@@ -3316,6 +3316,29 @@
             .admin-nav.open {
                 left: 0;
             }
+            .dash-sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                width: 280px;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            .dash-sidebar.open {
+                left: 0;
+            }
+            .dash-sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            .dash-sidebar.open {
+                left: 0;
+            }
             /* Lightbox - mobile friendly */
             .lightbox {
                 padding: 12px;
@@ -3517,10 +3540,10 @@
                     </div>
                     <div class="float-badge top">
                         <div class="badge-dot"></div>
-                    
+
                     </div>
                     <div class="float-badge bottom">
-                    
+
                     </div>
                 </div>
             </div>
@@ -3563,7 +3586,8 @@
                         <span class="tag tag-purple">Who We Are</span>
                         <h2>A Grassroots CBO Built<br>From the Ground Up</h2>
                         <p>MADIVA CBO is a community-based organization rooted in Bonchari, Kisii County. We believe in the power of local communities to lift themselves — and we provide the skills, knowledge, and platforms to make that happen.</p>
-                        <p>From hairdressing studios to financial boardrooms, our beneficiaries go on to build dignified livelihoods and lead their communities. We work in close collaboration with SHOFCO,Uwezo fund,Youth funds, International Solidarity  Foundation, Volunteers Network and NGAAF to expand our reach and deepen our impact.</p>
+                        <p>From hairdressing studios to financial boardrooms, our beneficiaries go on to build dignified livelihoods and lead their communities. We work in close collaboration with SHOFCO,Uwezo fund,Youth funds, International Solidarity Foundation,
+                            Volunteers Network and NGAAF to expand our reach and deepen our impact.</p>
                         <div class="about-highlights">
                             <div class="highlight-card hl-purple">
                                 <div class="icon"><i class="bi bi-scissors"></i></div>
@@ -3754,8 +3778,8 @@
                     <div class="partner-logo"><span></span> NGAAF</div>
                     <div class="partner-logo"><span></span> Youth fund</div>
                     <div class="partner-logo"><span></span> Uwezo fund</div>
-                    <div class="partner-logo"><span></span> International Solidarity Foundation</div> 
-                    
+                    <div class="partner-logo"><span></span> International Solidarity Foundation</div>
+
                     <h2>Join Us in Making a Difference</h2>
                     <p>Whether you're a sponsor, volunteer, or organization looking to collaborate — there's a place for you at MADIVA CBO.</p>
                     <div class="join-buttons">
@@ -3858,7 +3882,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
                     <div class="contact-form">
                         <div class="form-title">Send us a Message</div>
@@ -4937,13 +4961,16 @@
         const authFlow = window.authFlow || {
             resolveDashboardRole(role) {
                 const normalized = String(role || '').toLowerCase().trim();
+                if (normalized === 'administrator') return 'admin';
+                if (normalized === 'donor') return 'sponsor';
+                if (normalized === 'member') return 'volunteer';
                 return ['admin', 'sponsor', 'volunteer'].includes(normalized) ? normalized : 'admin';
             },
             persistAuthSession(token, user) {
                 if (!token || !user) return null;
                 const normalizedUser = {
                     ...user,
-                    role: this.resolveDashboardRole(user ?.role)
+                    role: this.resolveDashboardRole(user?.role)
                 };
                 localStorage.setItem('madiva_token', token);
                 localStorage.setItem('madiva_user', JSON.stringify(normalizedUser));
@@ -4965,7 +4992,7 @@
                     token,
                     user: user ? {
                         ...user,
-                        role: this.resolveDashboardRole(user ?.role)
+                        role: this.resolveDashboardRole(user?.role)
                     } : null,
                 };
             }
@@ -5119,11 +5146,11 @@
             }
 
             const authSession = authFlow.persistAuthSession(data.token, data.user);
-            authToken = authSession ?.token || data.token;
-            currentUser = authSession ?.user || data.user;
+            authToken = authSession?.token || data.token;
+            currentUser = authSession?.user || data.user;
             currentUser = {
                 ...currentUser,
-                role: authFlow.resolveDashboardRole(currentUser ?.role)
+                role: authFlow.resolveDashboardRole(currentUser?.role)
             };
 
             closePortal();
@@ -5142,20 +5169,25 @@
 
         /* ── Dashboard Shell ─────────────────────────── */
         function openDashboard(role) {
-            currentRole = authFlow.resolveDashboardRole(role);
+            const resolvedRole = authFlow.resolveDashboardRole(role || currentUser?.role || currentRole);
+            currentRole = resolvedRole;
             document.getElementById('dashboard').classList.add('open');
             document.getElementById('public-site').style.display = 'none';
 
-            ['admin-nav', 'sponsor-nav', 'volunteer-nav'].forEach(n =>
-                document.getElementById(n).style.display = 'none');
+            ['admin-nav', 'sponsor-nav', 'volunteer-nav'].forEach(n => {
+                const nav = document.getElementById(n);
+                if (nav) nav.style.display = 'none';
+            });
             document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+            closeSidebar();
+            closeMobileMenu();
 
             const roleConfig = {
                 admin: {
                     nav: 'admin-nav',
                     panel: 'admin-overview',
                     badge: 'Admin Dashboard',
-                    username: currentUser ?.name || 'Admin User',
+                    username: currentUser?.name || 'Admin User',
                     userrole: 'Administrator',
                     avatar: 'A',
                     avatarColor: 'var(--purple)'
@@ -5163,26 +5195,26 @@
                 sponsor: {
                     nav: 'sponsor-nav',
                     panel: 'sponsor-overview',
-                    badge: 'Sponsor Portal',
-                    username: currentUser ?.name || 'Sponsor User',
+                    badge: 'Sponsor Dashboard',
+                    username: currentUser?.name || 'Sponsor User',
                     userrole: `${currentUser?.sponsorLevel || 'Bronze'} Sponsor`,
                     avatar: 'S',
-                    avatarColor: 'var(--blue)'
+                    avatarColor: 'var(--green)'
                 },
                 volunteer: {
                     nav: 'volunteer-nav',
                     panel: 'vol-overview',
-                    badge: 'Volunteer Portal',
-                    username: currentUser ?.name || 'Volunteer User',
+                    badge: 'Volunteer Dashboard',
+                    username: currentUser?.name || 'Volunteer User',
                     userrole: `${currentUser?.badgeLevel || 'Starter'} Volunteer`,
                     avatar: 'V',
-                    avatarColor: 'var(--red)'
-                },
+                    avatarColor: 'var(--orange)'
+                }
             };
 
-            const cfg = roleConfig[currentRole];
-            document.getElementById(cfg.nav).style.display = 'block';
-            document.getElementById(cfg.panel).classList.add('active');
+            const cfg = roleConfig[resolvedRole] || roleConfig.admin;
+            const navEl = document.getElementById(cfg.nav);
+            if (navEl) navEl.style.display = 'block';
             document.getElementById('role-badge-text').textContent = cfg.badge;
             document.getElementById('dash-username').textContent = cfg.username;
             document.getElementById('dash-userrole').textContent = cfg.userrole;
@@ -5190,20 +5222,23 @@
             document.getElementById('dash-avatar').style.background = cfg.avatarColor;
             document.getElementById('dash-title').textContent = 'Overview';
 
-            const navEl = document.getElementById(cfg.nav);
-            navEl.querySelectorAll('li').forEach(li => li.classList.remove('active'));
-            if (navEl.querySelector('li')) navEl.querySelector('li').classList.add('active');
+            if (navEl) {
+                navEl.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+                const firstLink = navEl.querySelector('li a');
+                if (firstLink) firstLink.closest('li').classList.add('active');
+            }
 
-            // Load real data for the landing panel
-            if (currentRole === 'admin') loadAdminDashboard();
-            if (currentRole === 'sponsor') {
+            if (resolvedRole === 'admin') loadAdminDashboard();
+            if (resolvedRole === 'sponsor') {
                 loadSponsorOverview();
-                loadDonationHistory(); // pre-load so history tab is instant
+                loadDonationHistory();
             }
-            if (currentRole === 'volunteer') {
+            if (resolvedRole === 'volunteer') {
                 loadVolunteerOverview();
-                loadVolunteerProfile(); // pre-populate profile fields
+                loadVolunteerProfile();
             }
+
+            showPanel(cfg.panel, navEl?.querySelector('li a') || null);
         }
 
         function closeDashboard() {
@@ -5322,7 +5357,7 @@
             if (metricCards[0]) metricCards[0].querySelector('.val').textContent = (d.totalMembers || 0).toLocaleString();
             if (metricCards[1]) metricCards[1].querySelector('.val').textContent = 'KES ' + (Number(d.totalDonations || 0)).toLocaleString();
             if (metricCards[2]) metricCards[2].querySelector('.val').textContent = d.activeVolunteers || 0;
-            if (metricCards[3]) metricCards[3].querySelector('.val').textContent = (campaignsData.success ? (campaignsData.campaigns ?.length || 0) : 0).toLocaleString();
+            if (metricCards[3]) metricCards[3].querySelector('.val').textContent = (campaignsData.success ? (campaignsData.campaigns?.length || 0) : 0).toLocaleString();
 
             const financeSummary = financeData.success ? financeData.summary || {} : {};
             const financeSponsors = sponsorData.success ? (sponsorData.users || []).length : 0;
