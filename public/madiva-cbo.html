@@ -441,48 +441,53 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 480px;
         }
         
-        .hero-card {
-            background: white;
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border);
-            max-width: 400px;
-            width: 100%;
+        .hero-image-card {
             position: relative;
-            z-index: 2;
-        }
-        
-        .hero-card-header {
+            width: 100%;
+            min-height: 480px;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            background: linear-gradient(135deg, rgba(76, 29, 149, 0.55) 0%, rgba(15, 23, 42, 0.15) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 1000'%3E%3Crect width='900' height='1000' fill='%23fef3c7'/%3E%3Crect x='0' y='0' width='900' height='1000' fill='%23fdf2f8' opacity='0.65'/%3E%3Ccircle cx='650' cy='220' r='210' fill='%23f59e0b' opacity='0.25'/%3E%3Ccircle cx='240' cy='220' r='160' fill='%239c6bff' opacity='0.18'/%3E%3Crect x='120' y='680' width='660' height='220' rx='28' fill='%23ffffff' opacity='0.5'/%3E%3Ccircle cx='300' cy='300' r='92' fill='%23f7c38a'/%3E%3Ccircle cx='610' cy='290' r='98' fill='%233f2d67'/%3E%3Ccircle cx='455' cy='258' r='88' fill='%23f3a7b5'/%3E%3Cpath d='M240 390c0-81 66-147 147-147h24c81 0 147 66 147 147v120H240z' fill='%234b2e72'/%3E%3Cpath d='M242 400c0-80 65-145 145-145h18c80 0 145 65 145 145v110H242z' fill='%233a1f58'/%3E%3Cpath d='M600 390c0-86 70-156 156-156h20c86 0 156 70 156 156v118H600z' fill='%23f3b7aa'/%3E%3Cpath d='M650 400c0-84 68-152 152-152h16c84 0 152 68 152 152v112H650z' fill='%23d47473'/%3E%3Cpath d='M470 390c0-74 60-134 134-134h16c74 0 134 60 134 134v104H470z' fill='%23f6c86f'/%3E%3Cpath d='M490 398c0-73 59-132 132-132h15c73 0 132 59 132 132v96H490z' fill='%23e79d4f'/%3E%3Cpath d='M240 410h180v158c0 54-45 98-101 98h-78c-33 0-60-27-60-60v-96c0-29 24-53 53-53Z' fill='%233f2d67'/%3E%3Cpath d='M307 458h92v120c0 31-25 56-56 56h-36c-31 0-56-25-56-56V458Z' fill='%23f5c996'/%3E%3Cpath d='M296 543l-52 88c-15 25 2 56 32 56h8c17 0 29-10 36-24l41-81-65-39Z' fill='%23f59e0b'/%3E%3Cpath d='M570 420h180v160c0 52-42 95-94 95h-86c-31 0-56-25-56-56V420Z' fill='%23f09c84'/%3E%3Cpath d='M644 462h82v126c0 23-19 42-42 42h-40c-23 0-42-19-42-42V462Z' fill='%23fff7ec'/%3E%3Cpath d='M664 548l-40 84c-9 20 5 43 27 43h14c13 0 24-8 28-20l27-63-56-44Z' fill='%239c6bff'/%3E%3Cpath d='M482 532l-48 98c-9 20 4 42 25 42h16c14 0 26-9 31-22l31-76-55-42Z' fill='%23f4a261'/%3E%3Cpath d='M432 426h120v67c0 33-27 60-60 60h-60v-127Z' fill='%23d95870'/%3E%3Cpath d='M418 410h84v170c0 20-16 36-36 36h-48v-206Z' fill='%23d65a74'/%3E%3Cpath d='M350 150c0-40 32-72 72-72h20c40 0 72 32 72 72v42h-164z' fill='%233f2d67'/%3E%3Cpath d='M610 140c0-38 31-69 69-69h20c38 0 69 31 69 69v42H610z' fill='%23f7c38a'/%3E%3Ccircle cx='386' cy='118' r='26' fill='%23f4d2b8'/%3E%3Ccircle cx='680' cy='108' r='24' fill='%233f2d67'/%3E%3Cpath d='M298 138c34 5 64 26 82 54' stroke='%23221b3b' stroke-width='12' stroke-linecap='round'/%3E%3Cpath d='M620 138c26 6 47 24 64 50' stroke='%23a95041' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
             display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 24px;
+            align-items: flex-end;
+            justify-content: flex-start;
         }
         
-        .hero-avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, var(--purple) 0%, var(--red) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 22px;
+        .hero-image-overlay {
+            padding: 28px;
+            max-width: 320px;
+            margin: 24px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.15);
         }
         
-        .hero-card h3 {
+        .hero-image-overlay .tag {
+            margin-bottom: 10px;
+            display: inline-flex;
+        }
+        
+        .hero-image-overlay h3 {
             font-family: var(--font-display);
-            font-size: 18px;
+            font-size: 22px;
+            line-height: 1.25;
             color: var(--text-dark);
+            margin: 0 0 8px;
         }
         
-        .hero-card p {
-            font-size: 13px;
-            color: var(--text-muted);
+        .hero-image-overlay p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-mid);
+            margin: 0;
         }
         
         .program-list {
@@ -3506,63 +3511,18 @@
                     </div>
                 </div>
                 <div class="hero-visual">
-                    <div class="hero-card">
-                        <div class="hero-card-header">
-                            <div class="hero-avatar"><i class="bi bi-heart-fill"></i></div>
-                            <div>
-                                <h3>MADIVA CBO Programs</h3>
-                                <p>Suneka, Kisii — Active Now</p>
-                            </div>
+                    <div class="hero-image-card">
+                        <div class="hero-image-overlay">
+                            <span class="tag tag-purple">Youth-led change</span>
+                            <h3>Young people rising together for a brighter future.</h3>
+                            <p>Community action, mentorship, and opportunity are shaping stronger lives every day.</p>
                         </div>
-                        <div class="program-list">
-                            <div class="program-item">
-                                <div class="prog-icon prog-icon-p"><i class="bi bi-scissors"></i></div>
-                                <div>
-                                    <div class="prog-label">Hairdressing & Beauty Therapy</div>
-                                    <div class="prog-sub">Vocational Skills · Ongoing</div>
-                                </div>
-                            </div>
-                            <div class="program-item">
-                                <div class="prog-icon prog-icon-b"><i class="bi bi-cash-stack"></i></div>
-                                <div>
-                                    <div class="prog-label">Financial Literacy</div>
-                                    <div class="prog-sub">Economic Empowerment · Ongoing</div>
-                                </div>
-                            </div>
-                            <div class="program-item">
-                                <div class="prog-icon prog-icon-r"><i class="bi bi-stars"></i></div>
-                                <div>
-                                    <div class="prog-label">Youth Leadership</div>
-                                    <div class="prog-sub">Voice & Empowerment · Ongoing</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="float-badge top">
-                        <div class="badge-dot"></div>
-
-                    </div>
-                    <div class="float-badge bottom">
-
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ── ONGOING ACTIVITIES (Beside Hero) ── -->
-        <section id="activities-section" style="padding: 40px 5%; background: white;">
-            <div class="section-inner">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-                    <div>
-                        <span class="tag tag-blue">What's Happening</span>
-                        <h2 style="font-family:var(--font-display);margin-top:8px">Ongoing Activities</h2>
-                    </div>
-                </div>
-                <div id="activities-showcase" style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
-                    <p style="color:var(--text-muted)">Loading latest activities...</p>
-                </div>
-            </div>
-        </section>
+
 
         <!-- ── FUNDRAISING CAMPAIGNS ── -->
         <section id="campaigns-section" style="padding: 80px 5%; background: var(--purple-pale);">
@@ -4970,7 +4930,7 @@
                 if (!token || !user) return null;
                 const normalizedUser = {
                     ...user,
-                    role: this.resolveDashboardRole(user?.role)
+                    role: this.resolveDashboardRole(user ? .role)
                 };
                 localStorage.setItem('madiva_token', token);
                 localStorage.setItem('madiva_user', JSON.stringify(normalizedUser));
@@ -4992,7 +4952,7 @@
                     token,
                     user: user ? {
                         ...user,
-                        role: this.resolveDashboardRole(user?.role)
+                        role: this.resolveDashboardRole(user ? .role)
                     } : null,
                 };
             }
@@ -5146,11 +5106,11 @@
             }
 
             const authSession = authFlow.persistAuthSession(data.token, data.user);
-            authToken = authSession?.token || data.token;
-            currentUser = authSession?.user || data.user;
+            authToken = authSession ? .token || data.token;
+            currentUser = authSession ? .user || data.user;
             currentUser = {
                 ...currentUser,
-                role: authFlow.resolveDashboardRole(currentUser?.role)
+                role: authFlow.resolveDashboardRole(currentUser ? .role)
             };
 
             closePortal();
@@ -5169,7 +5129,7 @@
 
         /* ── Dashboard Shell ─────────────────────────── */
         function openDashboard(role) {
-            const resolvedRole = authFlow.resolveDashboardRole(role || currentUser?.role || currentRole);
+            const resolvedRole = authFlow.resolveDashboardRole(role || currentUser ? .role || currentRole);
             currentRole = resolvedRole;
             document.getElementById('dashboard').classList.add('open');
             document.getElementById('public-site').style.display = 'none';
@@ -5187,7 +5147,7 @@
                     nav: 'admin-nav',
                     panel: 'admin-overview',
                     badge: 'Admin Dashboard',
-                    username: currentUser?.name || 'Admin User',
+                    username: currentUser ? .name || 'Admin User',
                     userrole: 'Administrator',
                     avatar: 'A',
                     avatarColor: 'var(--purple)'
@@ -5196,7 +5156,7 @@
                     nav: 'sponsor-nav',
                     panel: 'sponsor-overview',
                     badge: 'Sponsor Dashboard',
-                    username: currentUser?.name || 'Sponsor User',
+                    username: currentUser ? .name || 'Sponsor User',
                     userrole: `${currentUser?.sponsorLevel || 'Bronze'} Sponsor`,
                     avatar: 'S',
                     avatarColor: 'var(--green)'
@@ -5205,7 +5165,7 @@
                     nav: 'volunteer-nav',
                     panel: 'vol-overview',
                     badge: 'Volunteer Dashboard',
-                    username: currentUser?.name || 'Volunteer User',
+                    username: currentUser ? .name || 'Volunteer User',
                     userrole: `${currentUser?.badgeLevel || 'Starter'} Volunteer`,
                     avatar: 'V',
                     avatarColor: 'var(--orange)'
@@ -5238,7 +5198,7 @@
                 loadVolunteerProfile();
             }
 
-            showPanel(cfg.panel, navEl?.querySelector('li a') || null);
+            showPanel(cfg.panel, navEl ? .querySelector('li a') || null);
         }
 
         function closeDashboard() {
@@ -5357,7 +5317,7 @@
             if (metricCards[0]) metricCards[0].querySelector('.val').textContent = (d.totalMembers || 0).toLocaleString();
             if (metricCards[1]) metricCards[1].querySelector('.val').textContent = 'KES ' + (Number(d.totalDonations || 0)).toLocaleString();
             if (metricCards[2]) metricCards[2].querySelector('.val').textContent = d.activeVolunteers || 0;
-            if (metricCards[3]) metricCards[3].querySelector('.val').textContent = (campaignsData.success ? (campaignsData.campaigns?.length || 0) : 0).toLocaleString();
+            if (metricCards[3]) metricCards[3].querySelector('.val').textContent = (campaignsData.success ? (campaignsData.campaigns ? .length || 0) : 0).toLocaleString();
 
             const financeSummary = financeData.success ? financeData.summary || {} : {};
             const financeSponsors = sponsorData.success ? (sponsorData.users || []).length : 0;
@@ -5754,23 +5714,9 @@
             }).join('') : '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No active campaigns at the moment.</p>';
         }
 
-        async function loadActivitiesOnHomepage() {
-            const data = await apiCall('/activities', 'GET', null, false);
-            if (!data.success) return;
-            const container = document.getElementById('activities-showcase');
-            if (!container) return;
-            container.innerHTML = data.activities.length ? data.activities.map(a => `
-    <div class="activity-item">
-      <h4 style="margin-bottom:4px">${a.title}</h4>
-      <p style="font-size:14px;color:var(--text-mid);margin-bottom:8px">${a.description}</p>
-      <small style="color:var(--text-muted)">📅 ${new Date(a.date).toLocaleDateString('en-KE')} | 📍 ${a.location}</small>
-    </div>`).join('') : '<p style="color:var(--text-muted)">No ongoing activities scheduled.</p>';
-        }
-
         // Initialize homepage data
         document.addEventListener('DOMContentLoaded', () => {
             loadCampaignsOnHomepage();
-            loadActivitiesOnHomepage();
         });
 
         /* ── Admin: load finance table ──────────────── */
