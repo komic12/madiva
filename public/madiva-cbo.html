@@ -3743,10 +3743,10 @@
                     <h2>Join Us in Making a Difference</h2>
                     <p>Whether you're a sponsor, volunteer, or organization looking to collaborate — there's a place for you at MADIVA CBO.</p>
                     <div class="join-buttons">
-                        <button class="btn btn-primary" onclick="openPortalAs('sponsor')">🤝 Become a Sponsor</button>
-                        <button class="btn btn-red" onclick="openPortalAs('volunteer')">🙋 Volunteer with Us</button>
-                        <button class="btn btn-blue" onclick="openMpesa()">📱 Donate via M-Pesa</button>
-                        <a href="#contact" class="btn btn-outline">📩 Contact Us</a>
+                        <button class="btn btn-primary" onclick="openPortalAs('sponsor')"><i class="bi bi-hands-helping"></i> Become a Sponsor</button>
+                        <button class="btn btn-red" onclick="openPortalAs('volunteer')"><i class="bi bi-people-fill"></i> Volunteer with Us</button>
+                        <button class="btn btn-blue" onclick="openMpesa()"><i class="bi bi-phone-fill"></i> Donate via M-Pesa</button>
+                        <a href="#contact" class="btn btn-outline"><i class="bi bi-envelope-fill"></i> Contact Us</a>
                     </div>
                 </div>
             </div>
@@ -3762,8 +3762,8 @@
                 </div>
                 <div class="gallery-filters">
                     <button class="filter-btn active" onclick="filterGallery('all',this)">All</button>
-                    <button class="filter-btn" onclick="filterGallery('image',this)">📸 Photos</button>
-                    <button class="filter-btn" onclick="filterGallery('video',this)">🎬 Videos</button>
+                    <button class="filter-btn" onclick="filterGallery('image',this)"><i class="bi bi-camera-fill"></i> Photos</button>
+                    <button class="filter-btn" onclick="filterGallery('video',this)"><i class="bi bi-camera-reels-fill"></i> Videos</button>
                     <button class="filter-btn" onclick="filterGallery('programs',this)">Programs</button>
                     <button class="filter-btn" onclick="filterGallery('events',this)">Events</button>
                     <button class="filter-btn" onclick="filterGallery('team',this)">Team</button>
@@ -3772,7 +3772,7 @@
                 </div>
 
                 <div class="gallery-grid" id="gallery-grid">
-                    <div class="gallery-empty"><span>📸</span>Gallery loading… or no media uploaded yet.<br><small>Logged-in admins can upload photos & videos here.</small></div>
+                    <div class="gallery-empty"><span><i class="bi bi-camera"></i></span>Gallery loading… or no media uploaded yet.<br><small>Logged-in admins can upload photos & videos here.</small></div>
                 </div>
             </div>
         </section>
@@ -3780,7 +3780,7 @@
         <!-- LIGHTBOX -->
         <div id="lightbox" onclick="closeLightbox()">
             <div class="lightbox-inner" onclick="event.stopPropagation()">
-                <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+                <button class="lightbox-close" onclick="closeLightbox()"><i class="bi bi-x-lg"></i></button>
                 <div id="lightbox-content"></div>
                 <div class="lightbox-caption" id="lightbox-caption"></div>
             </div>
@@ -3821,21 +3821,21 @@
                         <p>Reach out to learn more about our programs, partnership opportunities, or how you can support MADIVA CBO's mission in Kisii.</p>
                         <div class="contact-items">
                             <div class="contact-item">
-                                <div class="contact-icon ci-p">📍</div>
+                                <div class="contact-icon ci-p"><i class="bi bi-geo-alt-fill"></i></div>
                                 <div>
                                     <strong>Location</strong>
                                     <span>Suneka Wrongside Kisii County</span>
                                 </div>
                             </div>
                             <div class="contact-item">
-                                <div class="contact-icon ci-r">📧</div>
+                                <div class="contact-icon ci-r"><i class="bi bi-envelope-fill"></i></div>
                                 <div>
                                     <strong>Email</strong>
                                     <span>madivacbo@gmail.com</span>
                                 </div>
                             </div>
                             <div class="contact-item">
-                                <div class="contact-icon ci-b">📱</div>
+                                <div class="contact-icon ci-b"><i class="bi bi-phone-fill"></i></div>
                                 <div>
                                     <strong>Social Media</strong>
                                     <span>@madivacbo · Facebook · Instagram · Twitter</span>
@@ -3924,7 +3924,7 @@
                 </div>
                 <div class="footer-bottom">
                     <p>© 2025 MADIVA CBO — Suneka, Kisii County, Kenya. All rights reserved.</p>
-                    <p>💜 Empowering Communities, Changing Lives</p>
+                    <p><i class="bi bi-heart-fill"></i> Empowering Communities, Changing Lives</p>
                 </div>
             </div>
         </footer>
@@ -4311,10 +4311,10 @@
         <!-- MAIN CONTENT -->
         <div class="dash-main">
             <div class="dash-topbar">
-                <button class="dash-menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+                <button class="dash-menu-btn" onclick="toggleSidebar()" aria-label="Menu"><i class="bi bi-list"></i></button>
                 <h1 id="dash-title">Dashboard</h1>
                 <div class="topbar-right">
-                    <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+                    <div class="notif-btn"><i class="bi bi-bell-fill"></i><span class="notif-dot"></span></div>
                     <div class="dash-user">
                         <div class="dash-avatar" id="dash-avatar" style="background: var(--purple)">A</div>
                         <div class="dash-user-info">
@@ -4331,25 +4331,25 @@
                 <div class="dash-panel active" id="admin-overview">
                     <div class="metrics-row" id="admin-metrics">
                         <div class="metric-card">
-                            <div class="metric-icon">👥</div>
+                            <div class="metric-icon"><i class="bi bi-people-fill"></i></div>
                             <div class="label">Total Members</div>
                             <div class="val" id="metric-members">—</div>
                             <div class="change">Loading…</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">💰</div>
+                            <div class="metric-icon"><i class="bi bi-cash-stack"></i></div>
                             <div class="label">Donations (KES)</div>
                             <div class="val" id="metric-donations">—</div>
                             <div class="change">Loading…</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">🙋</div>
+                            <div class="metric-icon"><i class="bi bi-people-fill"></i></div>
                             <div class="label">Active Volunteers</div>
                             <div class="val" id="metric-volunteers">—</div>
                             <div class="change">Loading…</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">📚</div>
+                            <div class="metric-icon"><i class="bi bi-journal-bookmark-fill"></i></div>
                             <div class="label">Active Programs</div>
                             <div class="val" id="metric-programs">—</div>
                             <div class="change">Loading…</div>
@@ -4365,10 +4365,10 @@
                         <div class="dash-card">
                             <h3>Quick Actions</h3>
                             <div class="quick-actions">
-                                <button class="qa-btn" onclick="showPanel('admin-members',null)"><span class="qa-icon">👤</span>Members</button>
-                                <button class="qa-btn" onclick="showPanel('admin-programs',null)"><span class="qa-icon">📚</span>Programs</button>
-                                <button class="qa-btn" onclick="showPanel('admin-finance',null)"><span class="qa-icon">💳</span>Finance</button>
-                                <button class="qa-btn" onclick="showPanel('admin-media',null)"><span class="qa-icon">🖼️</span>Media</button>
+                                <button class="qa-btn" onclick="showPanel('admin-members',null)"><span class="qa-icon"><i class="bi bi-person-fill"></i></span>Members</button>
+                                <button class="qa-btn" onclick="showPanel('admin-programs',null)"><span class="qa-icon"><i class="bi bi-journal-bookmark-fill"></i></span>Programs</button>
+                                <button class="qa-btn" onclick="showPanel('admin-finance',null)"><span class="qa-icon"><i class="bi bi-credit-card-fill"></i></span>Finance</button>
+                                <button class="qa-btn" onclick="showPanel('admin-media',null)"><span class="qa-icon"><i class="bi bi-images"></i></span>Media</button>
                             </div>
                         </div>
                     </div>
@@ -4517,10 +4517,10 @@
                         <div class="dash-card">
                             <h3>Generate Reports (PDF)</h3>
                             <div class="quick-actions">
-                                <button class="qa-btn" onclick="generateAndSaveReport('impact')"><span class="qa-icon">📊</span>Impact Report</button>
-                                <button class="qa-btn" onclick="generateAndSaveReport('members')"><span class="qa-icon">👥</span>Members Report</button>
-                                <button class="qa-btn" onclick="generateAndSaveReport('finance')"><span class="qa-icon">💰</span>Finance Report</button>
-                                <button class="qa-btn" onclick="generateAndSaveReport('programs')"><span class="qa-icon">📚</span>Programs Report</button>
+                                <button class="qa-btn" onclick="generateAndSaveReport('impact')"><span class="qa-icon"><i class="bi bi-bar-chart-fill"></i></span>Impact Report</button>
+                                <button class="qa-btn" onclick="generateAndSaveReport('members')"><span class="qa-icon"><i class="bi bi-people-fill"></i></span>Members Report</button>
+                                <button class="qa-btn" onclick="generateAndSaveReport('finance')"><span class="qa-icon"><i class="bi bi-cash-stack"></i></span>Finance Report</button>
+                                <button class="qa-btn" onclick="generateAndSaveReport('programs')"><span class="qa-icon"><i class="bi bi-journal-bookmark-fill"></i></span>Programs Report</button>
                             </div>
                         </div>
                         <div class="dash-card">
@@ -4586,22 +4586,22 @@
                     <!-- Stats row -->
                     <div class="metrics-row" id="media-stats-row">
                         <div class="metric-card">
-                            <div class="metric-icon">🖼️</div>
+                            <div class="metric-icon"><i class="bi bi-images"></i></div>
                             <div class="label">Total Photos</div>
                             <div class="val" id="stat-images">—</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">🎬</div>
+                            <div class="metric-icon"><i class="bi bi-camera-reels-fill"></i></div>
                             <div class="label">Total Videos</div>
                             <div class="val" id="stat-videos">—</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">✅</div>
+                            <div class="metric-icon"><i class="bi bi-check-circle-fill"></i></div>
                             <div class="label">Published</div>
                             <div class="val" id="stat-published">—</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">💾</div>
+                            <div class="metric-icon"><i class="bi bi-hdd-fill"></i></div>
                             <div class="label">Storage Used</div>
                             <div class="val" id="stat-storage">—</div>
                         </div>
@@ -4611,7 +4611,7 @@
                     <div class="dash-card" style="margin-bottom:20px">
                         <h3>Upload Photos & Videos</h3>
                         <div class="upload-zone" id="upload-zone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)" onclick="document.getElementById('file-input').click()">
-                            <div class="upload-icon">📁</div>
+                            <div class="upload-icon"><i class="bi bi-upload"></i></div>
                             <h3>Click to browse or drag & drop files here</h3>
                             <p>Photos: JPG, PNG, WEBP up to 10MB each &nbsp;|&nbsp; Videos: MP4, MOV, AVI up to 200MB each &nbsp;|&nbsp; Max 20 files at once</p>
                         </div>
@@ -4644,7 +4644,7 @@
 
                     <!-- Existing media library -->
                     <div class="dash-card">
-                        <h3>Media Library <a href="javascript:void(0)" onclick="loadAdminMedia()">↻ Refresh</a></h3>
+                        <h3>Media Library <a href="javascript:void(0)" onclick="loadAdminMedia()"><i class="bi bi-arrow-clockwise"></i> Refresh</a></h3>
                         <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
                             <button class="filter-btn active" onclick="filterAdminMedia('all',this)">All</button>
                             <button class="filter-btn" onclick="filterAdminMedia('image',this)">Photos</button>
@@ -4660,24 +4660,24 @@
                 <div class="dash-panel" id="sponsor-overview">
                     <div class="metrics-row">
                         <div class="metric-card">
-                            <div class="metric-icon">💳</div>
+                            <div class="metric-icon"><i class="bi bi-credit-card-fill"></i></div>
                             <div class="label">Total Donated (KES)</div>
                             <div class="val" id="sponsor-total-donated">—</div>
                             <div class="change">Loading…</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">👥</div>
+                            <div class="metric-icon"><i class="bi bi-people-fill"></i></div>
                             <div class="label">People Impacted</div>
                             <div class="val" id="sponsor-impacted">—</div>
                             <div class="change">Loading…</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">📚</div>
+                            <div class="metric-icon"><i class="bi bi-journal-bookmark-fill"></i></div>
                             <div class="label">Programs Supported</div>
                             <div class="val" id="sponsor-programs">—</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">🏆</div>
+                            <div class="metric-icon"><i class="bi bi-trophy-fill"></i></div>
                             <div class="label">Sponsor Level</div>
                             <div class="val" id="sponsor-level" style="font-size:18px">—</div>
                         </div>
@@ -4692,13 +4692,13 @@
                         <div class="dash-card">
                             <h3>Next Steps</h3>
                             <div class="activity-list">
-                                <div class="act-item"><span class="act-icon">💳</span>
+                                <div class="act-item"><span class="act-icon"><i class="bi bi-credit-card-fill"></i></span>
                                     <div class="act-info"><strong>Make a new donation</strong><span>Support a program today</span></div>
                                 </div>
-                                <div class="act-item"><span class="act-icon">📊</span>
+                                <div class="act-item"><span class="act-icon"><i class="bi bi-bar-chart-fill"></i></span>
                                     <div class="act-info"><strong>Download impact report</strong><span>Q2 2025 ready</span></div>
                                 </div>
-                                <div class="act-item"><span class="act-icon">🙋</span>
+                                <div class="act-item"><span class="act-icon"><i class="bi bi-people-fill"></i></span>
                                     <div class="act-info"><strong>Invite a friend to sponsor</strong><span>Grow our supporter base</span></div>
                                 </div>
                             </div>
@@ -4722,7 +4722,7 @@
                                 <p>Funds a week of training</p>
                             </div>
                             <div class="tier-card" onclick="selectTier(this,'KES 15,000')">
-                                <div class="tier-label">🌟 Champion</div>
+                                <div class="tier-label"><i class="bi bi-stars"></i> Champion</div>
                                 <h4>KES 15,000</h4>
                                 <p>Sponsors a full month</p>
                             </div>
@@ -4781,9 +4781,9 @@
                     <div class="dash-card">
                         <h3>Impact Reports</h3>
                         <div class="activity-list" id="sponsor-reports-list">
-                            <div class="act-item"><span class="act-icon">📄</span>
+                            <div class="act-item"><span class="act-icon"><i class="bi bi-file-earmark-text-fill"></i></span>
                                 <div class="act-info"><strong>My Donation Impact Report</strong><span>Personalised live report from your contributions</span></div><button class="btn btn-outline btn-sm" style="margin-left:auto;white-space:nowrap" onclick="downloadSponsorReport()">Download</button></div>
-                            <div class="act-item"><span class="act-icon">📊</span>
+                            <div class="act-item"><span class="act-icon"><i class="bi bi-bar-chart-fill"></i></span>
                                 <div class="act-info"><strong>Donation History Export</strong><span>All your past donations in one file</span></div><button class="btn btn-outline btn-sm" style="margin-left:auto;white-space:nowrap" onclick="exportDonationHistory()">Export CSV</button></div>
                         </div>
                     </div>
@@ -4793,24 +4793,24 @@
                 <div class="dash-panel" id="vol-overview">
                     <div class="metrics-row">
                         <div class="metric-card">
-                            <div class="metric-icon">⏰</div>
+                            <div class="metric-icon"><i class="bi bi-clock-fill"></i></div>
                             <div class="label">Total Hours</div>
                             <div class="val">—</div>
                             <div class="change">Loading…</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">📅</div>
+                            <div class="metric-icon"><i class="bi bi-calendar-event-fill"></i></div>
                             <div class="label">Shifts Completed</div>
                             <div class="val">—</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">🌟</div>
+                            <div class="metric-icon"><i class="bi bi-stars"></i></div>
                             <div class="label">Impact Points</div>
                             <div class="val">—</div>
                             <div class="change">Loading…</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-icon">🎖️</div>
+                            <div class="metric-icon"><i class="bi bi-award-fill"></i></div>
                             <div class="label">Badge Level</div>
                             <div class="val" style="font-size:18px">—</div>
                         </div>
@@ -5288,7 +5288,7 @@
                 if (list) {
                     list.innerHTML = activities.slice(0, 5).map(a => `
         <div class="act-item">
-          <span class="act-icon">${a.type === 'donation_received' ? '💰' : a.type === 'user_login' ? '👤' : '📋'}</span>
+          <span class="act-icon">${a.type === 'donation_received' ? '<i class="bi bi-cash-stack"></i>' : a.type === 'user_login' ? '<i class="bi bi-person-fill"></i>' : '<i class="bi bi-card-checklist"></i>'}</span>
           <div class="act-info">
             <strong>${a.description}</strong>
             <span>${new Date(a.timestamp).toLocaleString('en-KE', { dateStyle:'medium', timeStyle:'short' })}</span>
@@ -5380,9 +5380,9 @@
           <td><span class="status-pill ${u.isActive ? 'sp-active' : 'sp-pending'}">${u.isActive ? 'Active' : 'Inactive'}</span></td>
           <td>${new Date(u.createdAt).toLocaleDateString('en-KE')}</td>
           <td>
-            <button class="action-btn" onclick="editMember('${u.uid}', '${u.name}', '${u.email}', '${u.role}', '${u.phone || ''}')" title="Edit">✏️</button>
-            <button class="action-btn" onclick="toggleMemberStatus('${u.uid}', ${u.isActive})" title="${u.isActive ? 'Ban' : 'Unban'}">${u.isActive ? '🚫' : '✅'}</button>
-            <button class="action-btn" onclick="deleteMember('${u.uid}', '${u.name}')" title="Delete">🗑️</button>
+            <button class="action-btn" onclick="editMember('${u.uid}', '${u.name}', '${u.email}', '${u.role}', '${u.phone || ''}')" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+            <button class="action-btn" onclick="toggleMemberStatus('${u.uid}', ${u.isActive})" title="${u.isActive ? 'Ban' : 'Unban'}">${u.isActive ? '<i class="bi bi-person-dash-fill"></i>' : '<i class="bi bi-person-check-fill"></i>'}</button>
+            <button class="action-btn" onclick="deleteMember('${u.uid}', '${u.name}')" title="Delete"><i class="bi bi-trash-fill"></i></button>
           </td>
         </tr>`).join('') :
                 '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No members yet.</td></tr>';
