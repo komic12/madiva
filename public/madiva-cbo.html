@@ -8242,7 +8242,6 @@ async function uploadFiles() {
   filesToUpload.forEach(f => formData.append('files', f));
   formData.append('category', category);
   formData.append('caption', caption);
-  const externalLink = document.getElementById('upload-link').value.trim();
   if (externalLink) {
     formData.append('link', externalLink);
   }
