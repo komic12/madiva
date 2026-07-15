@@ -10,7 +10,7 @@ const generateToken = (uid) =>
 
 const makeUid = () => 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
 
-const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || process.env.ADMIN_EMAIL || 'madiva@gmail.com';
+const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || process.env.ADMIN_EMAIL || 'madivacbo@gmail.com';
 const DEFAULT_ADMIN_NAME = process.env.DEFAULT_ADMIN_NAME || 'Admin User';
 const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || 'admin123456';
 
