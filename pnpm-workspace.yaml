@@ -1,3 +1,6 @@
 allowBuilds:
-  '@firebase/util': set this to true or false
-  protobufjs: set this to true or false
+  '@firebase/util': true
+  bufferutil: true
+  es5-ext: true
+  protobufjs: true
+  utf-8-validate: true
