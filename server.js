@@ -45,6 +45,7 @@ app.use(morgan('dev'));
 // ── Static files ─────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // ── File upload setup ─────────────────────────────────────────────────────────
 const storage = multer.memoryStorage();
