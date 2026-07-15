@@ -4883,40 +4883,6 @@
             </div>
         </section>
 
-        <!-- GALLERY -->
-        <section id="gallery">
-            <div class="section-inner">
-                <div class="section-header">
-                    <span class="tag tag-purple">Our Moments</span>
-                    <h2>Photos & Videos</h2>
-                    <p>A glimpse into the life and work of MADIVA CBO — our programs, events, and community in action.</p>
-                </div>
-                <div class="gallery-filters">
-                    <button class="filter-btn active" onclick="filterGallery('all',this)">All</button>
-                    <button class="filter-btn" onclick="filterGallery('image',this)"><i class="bi bi-camera-fill"></i> Photos</button>
-                    <button class="filter-btn" onclick="filterGallery('video',this)"><i class="bi bi-camera-reels-fill"></i> Videos</button>
-                    <button class="filter-btn" onclick="filterGallery('programs',this)">Programs</button>
-                    <button class="filter-btn" onclick="filterGallery('events',this)">Events</button>
-                    <button class="filter-btn" onclick="filterGallery('team',this)">Team</button>
-                    <button class="filter-btn" onclick="filterGallery('general',this)">General</button>
-                    <button class="filter-btn" onclick="filterGallery('gallery',this)">Gallery</button>
-                </div>
-
-                <div class="gallery-grid" id="gallery-grid">
-                    <div class="gallery-empty"><span><i class="bi bi-camera"></i></span>Gallery loading… or no media uploaded yet.<br><small>Logged-in admins can upload photos & videos here.</small></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- LIGHTBOX -->
-        <div id="lightbox" onclick="closeLightbox()">
-            <div class="lightbox-inner" onclick="event.stopPropagation()">
-                <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close image preview"><i class="bi bi-x-lg"></i></button>
-                <div id="lightbox-content"></div>
-                <div class="lightbox-caption" id="lightbox-caption"></div>
-            </div>
-        </div>
-
         <!-- MAP SECTION -->
         <section id="map-section">
             <div class="map-inner">
@@ -5409,7 +5375,6 @@
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-finance',this)"><span class="nav-icon"><i class="bi bi-cash-stack"></i></span> Finance</a></li>
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-reports',this)"><span class="nav-icon"><i class="bi bi-bar-chart-fill"></i></span> Reports</a></li>
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-settings',this)"><span class="nav-icon"><i class="bi bi-gear-fill"></i></span> Settings</a></li>
-                    <li><a href="javascript:void(0)" onclick="showPanel('admin-media',this)"><span class="nav-icon"><i class="bi bi-images"></i></span> Media Library</a></li>
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-activities',this)"><span class="nav-icon"><i class="bi bi-calendar-event-fill"></i></span> Activities</a></li>
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-approvals',this)"><span class="nav-icon"><i class="bi bi-check-circle-fill"></i></span> Hour Approvals</a></li>
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-campaigns',this)"><span class="nav-icon"><i class="bi bi-megaphone-fill"></i></span> Campaigns</a></li>
@@ -5504,7 +5469,6 @@
                                 <button class="qa-btn" onclick="showPanel('admin-members',null)"><span class="qa-icon"><i class="bi bi-person-fill"></i></span>Members</button>
                                 <button class="qa-btn" onclick="showPanel('admin-programs',null)"><span class="qa-icon"><i class="bi bi-journal-bookmark-fill"></i></span>Programs</button>
                                 <button class="qa-btn" onclick="showPanel('admin-finance',null)"><span class="qa-icon"><i class="bi bi-credit-card-fill"></i></span>Finance</button>
-                                <button class="qa-btn" onclick="showPanel('admin-media',null)"><span class="qa-icon"><i class="bi bi-images"></i></span>Media</button>
                             </div>
                         </div>
                     </div>
@@ -5713,88 +5677,6 @@
                         </div>
                         <div id="campaigns-list" class="ui-23">
                             <p class="ui-19">Loading campaigns...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ═══ ADMIN MEDIA LIBRARY PANEL ═══ -->
-                <div class="dash-panel" id="admin-media">
-                    <!-- Stats row -->
-                    <div class="metrics-row" id="media-stats-row">
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-images"></i></div>
-                            <div class="label">Total Photos</div>
-                            <div class="val" id="stat-images">—</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-camera-reels-fill"></i></div>
-                            <div class="label">Total Videos</div>
-                            <div class="val" id="stat-videos">—</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="label">Published</div>
-                            <div class="val" id="stat-published">—</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-icon"><i class="bi bi-hdd-fill"></i></div>
-                            <div class="label">Storage Used</div>
-                            <div class="val" id="stat-storage">—</div>
-                        </div>
-                    </div>
-
-                    <!-- Upload zone -->
-                    <div class="dash-card ui-10">
-                        <h3>Upload Photos & Videos</h3>
-                        <div class="upload-zone" id="upload-zone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)" onclick="document.getElementById('file-input').click()">
-                            <div class="upload-icon"><i class="bi bi-upload"></i></div>
-                            <h3>Click to browse or drag & drop files here</h3>
-                            <p>Photos: JPG, PNG, WEBP up to 10MB each &nbsp;|&nbsp; Videos: MP4, MOV, AVI up to 200MB each &nbsp;|&nbsp; Max 20 files at once</p>
-                        </div>
-                        <label for="file-input" class="sr-only">Upload media files</label>
-                        <input type="file" id="file-input" multiple accept="image/*,video/*" onchange="previewFiles(event)" class="ui-5" title="Upload media files">
-                        <div class="upload-preview" id="upload-preview"></div>
-                        <div class="upload-progress" id="upload-progress">
-                            <div class="upload-progress-fill" id="upload-progress-fill"></div>
-                        </div>
-                        <div id="upload-status" class="ui-24"></div>
-                        <div class="ui-25">
-                            <div class="form-group ui-11">
-                                <label for="upload-category">Category</label>
-                                <select id="upload-category" title="Media category">
-                <option value="general">General</option>
-                <option value="programs">Programs</option>
-                <option value="events">Events</option>
-                <option value="team">Team</option>
-                <option value="gallery">Gallery</option>
-              </select>
-                            </div>
-                            <div class="form-group ui-12">
-                                <label>Caption (optional)</label>
-                                <input type="text" id="upload-caption" placeholder="e.g. Hairdressing graduation ceremony 2025">
-                            </div>
-                            <div class="form-group ui-12">
-                                <label>External media link</label>
-                                <input type="url" id="upload-link" placeholder="Paste YouTube, Facebook, Instagram or other media URL" oninput="updateUploadStatus()">
-                                <small>Use this when uploading from a link instead of a file.</small>
-                            </div>
-                            <div class="ui-26">
-                                <button class="btn btn-primary btn-sm" id="upload-btn" onclick="uploadFiles()" disabled>⬆ Upload</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Existing media library -->
-                    <div class="dash-card">
-                        <h3>Media Library <a href="javascript:void(0)" onclick="loadAdminMedia()"><i class="bi bi-arrow-clockwise"></i> Refresh</a></h3>
-                        <div class="ui-27">
-                            <button class="filter-btn active" onclick="filterAdminMedia('all',this)">All</button>
-                            <button class="filter-btn" onclick="filterAdminMedia('image',this)">Photos</button>
-                            <button class="filter-btn" onclick="filterAdminMedia('video',this)">Videos</button>
-                            <button class="btn btn-secondary btn-xs" onclick="checkSupabaseConnection()">Check Supabase</button>
-                        </div>
-                        <div class="media-grid" id="admin-media-grid">
-                            <div class="ui-28">Loading media…</div>
                         </div>
                     </div>
                 </div>
@@ -6402,10 +6284,6 @@
                     label: 'Settings',
                     icon: 'bi-gear-fill'
                 }, {
-                    panel: 'admin-media',
-                    label: 'Media Library',
-                    icon: 'bi-images'
-                }, {
                     panel: 'admin-activities',
                     label: 'Activities',
                     icon: 'bi-calendar-event-fill'
@@ -6508,8 +6386,6 @@
                 'vol-hours': 'Hours Log',
                 'vol-profile': 'My Profile',
             };
-            // Register admin media panel title
-            titles['admin-media'] = 'Media Library';
             if (titles[panelId]) document.getElementById('dash-title').textContent = titles[panelId];
 
             if (panelId === 'admin-overview') loadAdminDashboard();
@@ -6517,7 +6393,6 @@
             if (panelId === 'admin-finance') loadAdminFinance();
             if (panelId === 'admin-programs') loadAdminPrograms();
             if (panelId === 'admin-approvals') loadPendingApprovals();
-            if (panelId === 'admin-media') loadAdminMedia();
             if (panelId === 'admin-activities') loadActivities();
             if (panelId === 'admin-campaigns') {
                 loadCampaigns();
@@ -8086,8 +7961,6 @@
                 window.firebaseRealtimeDB.initializeFirebase();
             }
 
-            // Use the backend REST media API so the gallery reflects the same Firestore records the admin uploads create.
-            loadPublicGallery();
             loadCampaignsOnHomepage();
             loadActivitiesOnHomepage();
 
@@ -8103,270 +7976,7 @@
         });
 
         /* ══════════════════════════════════════════
-           GALLERY — Public
-        ══════════════════════════════════════════ */
-        let allMediaItems = [];
-
-        // Public media is served from the backend media API, not Realtime Database.
-        function subscribeToPublicMedia() {
-            loadPublicGallery();
-        }
-
-        async function loadPublicGallery() {
-            const data = await apiCall('/media?published=true&limit=24');
-            const grid = document.getElementById('gallery-grid');
-            if (!grid) return;
-            if (!data.success || !(data.media?.length)) {
-                grid.innerHTML = `<div class="gallery-empty"><span>📸</span>No media uploaded yet.<br><small>Check back soon!</small></div>`;
-                return;
-            }
-            allMediaItems = data.media;
-            renderGallery(allMediaItems);
-        }
-
-        function renderGallery(items) {
-            const grid = document.getElementById('gallery-grid');
-            if (!items.length) {
-                grid.innerHTML = `<div class="gallery-empty"><span>🔍</span>No media in this category yet.</div>`;
-                return;
-            }
-            grid.innerHTML = items.map(item => `
-    <div class="gallery-item" onclick="openLightbox('${item.url}','${item.type}','${(item.caption||'').replace(/'/g,"\\'")}')">
-      ${item.type === 'video'
-        ? `<video src="${item.url}" muted preload="metadata"></video><span class="video-badge">▶ VIDEO</span>`
-        : `<img src="${item.url}" alt="${item.caption || 'MADIVA CBO'}" loading="lazy">`
-      }
-      <span class="category-pill">${(item.category || 'general').toUpperCase()}</span>
-      <div class="gallery-overlay">
-        <span>${item.type === 'video' ? '▶' : '🔍'}</span>
-        <p>${item.caption || item.category || ''}</p>
-      </div>
-    </div>`).join('');
-}
-
-function filterGallery(filter, btn) {
-  document.querySelectorAll('.gallery-filters .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (filter === 'all')   return renderGallery(allMediaItems);
-  if (filter === 'image') return renderGallery(allMediaItems.filter(m => m.type === 'image'));
-  if (filter === 'video') return renderGallery(allMediaItems.filter(m => m.type === 'video'));
-  renderGallery(allMediaItems.filter(m => (m.category || 'general') === filter));
-}
-
-
-/* ── Lightbox ──────────────────────────────── */
-function openLightbox(url, type, caption) {
-  const lb = document.getElementById('lightbox');
-  const content = document.getElementById('lightbox-content');
-  content.innerHTML = type === 'video'
-    ? `<video src="${url}" controls autoplay  class="ui-72"></video>`
-    : `<img src="${url}" alt="${caption}">`;
-  document.getElementById('lightbox-caption').textContent = caption;
-  lb.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lightbox-content').innerHTML = '';
-  document.body.style.overflow = '';
-}
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLightbox(); closeMpesa(); } });
-
-/* ══════════════════════════════════════════
-   MEDIA UPLOAD — Admin Dashboard
-══════════════════════════════════════════ */
-let filesToUpload = [];
-let allAdminMedia = [];
-
-function previewFiles(event) {
-  const files = Array.from(event.target.files);
-  addFilesToQueue(files);
-}
-function handleDrop(event) {
-  event.preventDefault();
-  document.getElementById('upload-zone').classList.remove('dragover');
-  const files = Array.from(event.dataTransfer.files);
-  addFilesToQueue(files);
-}
-function addFilesToQueue(files) {
-  filesToUpload = [...filesToUpload, ...files].slice(0, 20);
-  renderPreviews();
-  updateUploadStatus();
-}
-function updateUploadStatus() {
-  const btn = document.getElementById('upload-btn');
-  const status = document.getElementById('upload-status');
-  const link = document.getElementById('upload-link').value.trim();
-  btn.disabled = filesToUpload.length === 0 && !link;
-  status.textContent = filesToUpload.length
-    ? `${filesToUpload.length} file(s) selected`
-    : link
-      ? 'Ready to upload external link'
-      : '';
-}
-function renderPreviews() {
-  const container = document.getElementById('upload-preview');
-  container.innerHTML = filesToUpload.map((file, i) => {
-    const url = URL.createObjectURL(file);
-    const isVideo = file.type.startsWith('video/');
-    return `<div class="preview-item">
-      ${isVideo
-        ? `<video src="${url}" muted></video>`
-        : `<img src="${url}" alt="${file.name}">`}
-      <button class="remove-preview" onclick="removePreview(${i})">✕</button>
-    </div>`;
-  }).join('');
-}
-function removePreview(index) {
-  filesToUpload.splice(index, 1);
-  renderPreviews();
-  updateUploadStatus();
-}
-
-async function uploadFiles() {
-  const externalLink = document.getElementById('upload-link').value.trim();
-  if (!filesToUpload.length && !externalLink) return;
-  const category = document.getElementById('upload-category').value;
-  const caption  = document.getElementById('upload-caption').value;
-  const btn      = document.getElementById('upload-btn');
-  const progress = document.getElementById('upload-progress');
-  const fill     = document.getElementById('upload-progress-fill');
-  const status   = document.getElementById('upload-status');
-
-  btn.disabled = true;
-  btn.textContent = 'Uploading…';
-  progress.style.display = 'block';
-  fill.style.width = '10%';
-
-  const formData = new FormData();
-  filesToUpload.forEach(f => formData.append('files', f));
-  formData.append('category', category);
-  formData.append('caption', caption);
-  if (externalLink) {
-    formData.append('link', externalLink);
-  }
-
-  try {
-    fill.style.width = '40%';
-    const res = await fetch(`${API}/media/upload`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${authToken}` },
-      body: formData,
-    });
-    fill.style.width = '90%';
-    const data = await res.json();
-    fill.style.width = '100%';
-
-    if (data.success) {
-      showToast(`✅ ${data.uploaded.length} file(s) uploaded!`);
-      status.textContent = `✅ ${data.uploaded.length} uploaded${data.errors?.length ? `, ${data.errors.length} failed` : ''}`;
-      filesToUpload = [];
-      renderPreviews();
-      document.getElementById('upload-caption').value = '';
-      document.getElementById('upload-link').value = '';
-      updateUploadStatus();
-      loadAdminMedia();
-      loadPublicGallery();
-    } else {
-      showToast(data.message || 'Upload failed.', 'error');
-      status.textContent = '❌ Upload failed: ' + (data.message || '');
-    }
-  } catch (e) {
-    showToast('Network error during upload.', 'error');
-    status.textContent = '❌ Network error.';
-  }
-
-  setTimeout(() => { progress.style.display = 'none'; fill.style.width = '0%'; }, 1200);
-  btn.disabled = false;
-  btn.textContent = '⬆ Upload';
-}
-
-async function checkSupabaseConnection() {
-  const data = await apiCall('/media/supabase/check', 'GET', null, true);
-  if (data.success) {
-    showToast('✅ Supabase is connected.');
-  } else {
-    showToast(`❌ Supabase check failed: ${data.message || 'Unknown error'}`, 'error');
-  }
-}
-
-async function loadAdminMedia() {
-  const [mediaData, statsData] = await Promise.all([
-    apiCall('/media?limit=100', 'GET', null, true),
-    apiCall('/media/stats', 'GET', null, true),
-  ]);
-
-  if (statsData.success) {
-    const s = statsData.stats;
-    document.getElementById('stat-images').textContent    = s.images    || 0;
-    document.getElementById('stat-videos').textContent    = s.videos    || 0;
-    document.getElementById('stat-published').textContent = s.published || 0;
-    document.getElementById('stat-storage').textContent   = (s.totalSizeMB || 0) + ' MB';
-  }
-
-  if (mediaData.success) {
-    allAdminMedia = mediaData.media || [];
-    renderAdminMedia(allAdminMedia);
-  }
-}
-
-function renderAdminMedia(items) {
-  const grid = document.getElementById('admin-media-grid');
-  if (!items.length) {
-    grid.innerHTML = `<div  class="ui-73">No media uploaded yet. Use the uploader above.</div>`;
-    return;
-  }
-  grid.innerHTML = items.map(item => `
-    <div class="media-thumb">
-      ${item.type === 'video'
-        ? `<video src="${item.url}" muted preload="metadata"></video>`
-        : `<img src="${item.url}" alt="${item.caption || ''}" loading="lazy">`}
-      <span class="media-type-badge">${item.type === 'video' ? '▶ VID' : '📷 IMG'}</span>
-      <div class="media-actions">
-        <button title="View" onclick="openLightbox('${item.url}','${item.type}','${(item.caption || '').replace(/'/g, "\\'")}' )"  class="ui-74">👁</button>
-        <button title="Edit" onclick="editMedia('${item.id}')"  class="ui-75">✏</button>
-        <button title="Delete" onclick="deleteMedia('${item.id}')"  class="ui-76">🗑</button>
-      </div>
-      <div  class="ui-77">
-        <span>${(item.caption || 'Untitled').slice(0, 18)}</span>
-        <span>${(item.category || 'general').toUpperCase()}</span>
-      </div>
-    </div>`).join('');
-}
-
-function filterAdminMedia(type, btn) {
-  document.querySelectorAll('#admin-media .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (type === 'all')   return renderAdminMedia(allAdminMedia);
-  renderAdminMedia(allAdminMedia.filter(m => m.type === type));
-}
-
-async function editMedia(id) {
-  const item = allAdminMedia.find(m => m.id === id);
-  if (!item) return;
-  const caption = prompt('Edit caption', item.caption || '');
-  if (caption === null) return;
-  const category = prompt('Edit category', item.category || 'general');
-  if (category === null) return;
-
-  const data = await apiCall(`/media/${id}`, 'PATCH', {
-    caption: caption.trim(),
-    category: category.trim() || 'general',
-  }, true);
-
-  showToast(data.message || (data.success ? 'Media updated!' : 'Could not update media.'), data.success ? 'success' : 'error');
-  if (data.success) { loadAdminMedia(); loadPublicGallery(); }
-}
-
-async function deleteMedia(id) {
-  if (!confirm('Delete this media permanently?')) return;
-  const data = await apiCall(`/media/${id}`, 'DELETE', null, true);
-  showToast(data.message || (data.success ? 'Deleted!' : 'Error'), data.success ? 'success' : 'error');
-  if (data.success) { loadAdminMedia(); loadPublicGallery(); }
-}
-
-/* ══════════════════════════════════════════
-   M-PESA STK PUSH
+           M-PESA STK PUSH
 ══════════════════════════════════════════ */
 let mpesaCheckoutId = null;
 let mpesaPolling    = null;
@@ -8461,18 +8071,6 @@ async function initiateMpesaPay() {
                 window.saveVolunteerProfile = saveVolunteerProfile;
                 window.saveAdminSettings = saveAdminSettings;
                 window.selectTier = selectTier;
-                window.loadPublicGallery = loadPublicGallery;
-                window.filterGallery = filterGallery;
-                window.openLightbox = openLightbox;
-                window.closeLightbox = closeLightbox;
-                window.previewFiles = previewFiles;
-                window.handleDrop = handleDrop;
-                window.addFilesToQueue = addFilesToQueue;
-                window.renderPreviews = renderPreviews;
-                window.removePreview = removePreview;
-                window.uploadFiles = uploadFiles;
-                window.loadAdminMedia = loadAdminMedia;
-                window.filterAdminMedia = filterAdminMedia;
                 window.showAddMemberForm = showAddMemberForm;
                 window.editMember = editMember;
                 window.toggleMemberStatus = toggleMemberStatus;
