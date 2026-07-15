@@ -6376,7 +6376,12 @@
             if (panelId === 'admin-members') loadAdminMembers();
             if (panelId === 'admin-finance') loadAdminFinance();
             if (panelId === 'admin-programs') loadAdminPrograms();
-            if (panelId === 'admin-approvals') loadPendingApprovals();
+            if (panelId === 'admin-approvals') {
+                loadPendingApprovals();
+                if (window.realtimeListeners && window.realtimeListeners.subscribeToPendingHours) {
+                    window.realtimeListeners.subscribeToPendingHours();
+                }
+            }
             if (panelId === 'admin-campaigns') {
                 loadCampaigns();
                 loadCampaignsForDropdown();
@@ -7077,7 +7082,6 @@
         async function loadPendingApprovals() {
             const data = await apiCall('/admin/pending-hours', 'GET', null, true);
             if (!data.success || !data.entries) {
-                showToast('Unable to load pending approvals.', 'error');
                 return;
             }
 
