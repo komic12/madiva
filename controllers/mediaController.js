@@ -2,6 +2,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const { bucket, collections, USE_FIREBASE, ensureFirebaseStorage } = require('../config/firebase');
 const { asyncHandler } = require('../middleware/errorHandler');
@@ -22,6 +23,52 @@ function transformMediaItem(media) {
 
 const ALLOWED_IMAGES = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 const ALLOWED_VIDEOS = ['.mp4', '.mov', '.avi', '.webm', '.mkv'];
+
+function buildSupabasePublicUrl(objectPath) {
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_BUCKET) return '';
+    const baseUrl = process.env.SUPABASE_URL.replace(/\/$/, '');
+    return `${baseUrl}/storage/v1/object/public/${encodeURIComponent(process.env.SUPABASE_BUCKET)}/${encodeURIComponent(objectPath)}`;
+}
+
+async function uploadToSupabase(file, objectPath) {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ANON_KEY;
+    const bucketName = process.env.SUPABASE_BUCKET;
+
+    if (!supabaseUrl || !serviceKey || !bucketName) {
+        throw new Error('Supabase storage configuration is incomplete.');
+    }
+
+    const response = await axios.post(`${supabaseUrl.replace(/\/$/, '')}/storage/v1/object/${encodeURIComponent(bucketName)}/${encodeURIComponent(objectPath)}`, file.buffer, {
+        headers: {
+            'Content-Type': file.mimetype || 'application/octet-stream',
+            apikey: serviceKey,
+            Authorization: `Bearer ${serviceKey}`,
+            'x-upsert': 'true',
+        },
+    });
+
+    if (response.status < 200 || response.status >= 300) {
+        throw new Error(`Supabase upload failed with status ${response.status}`);
+    }
+
+    return buildSupabasePublicUrl(objectPath);
+}
+
+async function deleteFromSupabase(objectPath) {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ANON_KEY;
+    const bucketName = process.env.SUPABASE_BUCKET;
+
+    if (!supabaseUrl || !serviceKey || !bucketName || !objectPath) return;
+
+    await axios.delete(`${supabaseUrl.replace(/\/$/, '')}/storage/v1/object/${encodeURIComponent(bucketName)}/${encodeURIComponent(objectPath)}`, {
+        headers: {
+            apikey: serviceKey,
+            Authorization: `Bearer ${serviceKey}`,
+        },
+    });
+}
 
 // POST /api/media/upload
 const uploadMedia = asyncHandler(async(req, res) => {
@@ -46,30 +93,37 @@ const uploadMedia = asyncHandler(async(req, res) => {
         const mediaType = isImage ? 'image' : 'video';
         const remoteFilePath = `madiva-cbo/${mediaType}s/${category}/${mediaId}${ext}`;
         let publicUrl = '';
-        let storageType = 'firebase';
+        let storageType = 'supabase';
         let localPath = null;
+        let storagePath = remoteFilePath;
 
         try {
-            ensureFirebaseStorage();
-            const fileRef = bucket.file(remoteFilePath);
-            await fileRef.save(file.buffer, { metadata: { contentType: file.mimetype } });
-            publicUrl = buildMediaUrl(mediaId);
-        } catch (firebaseError) {
-            console.warn('Firebase Storage upload failed, using local fallback:', firebaseError.message);
-            storageType = 'local';
-            const absoluteFolder = path.join(LOCAL_UPLOAD_ROOT, mediaType === 'image' ? 'images' : 'videos', category);
-            fs.mkdirSync(absoluteFolder, { recursive: true });
-            const absoluteFilePath = path.join(absoluteFolder, `${mediaId}${ext}`);
-            fs.writeFileSync(absoluteFilePath, file.buffer);
-            localPath = absoluteFilePath;
-            publicUrl = buildMediaUrl(mediaId);
+            publicUrl = await uploadToSupabase(file, remoteFilePath);
+        } catch (supabaseError) {
+            console.warn('Supabase Storage upload failed, trying Firebase fallback:', supabaseError.message);
+            try {
+                ensureFirebaseStorage();
+                const fileRef = bucket.file(remoteFilePath);
+                await fileRef.save(file.buffer, { metadata: { contentType: file.mimetype } });
+                storageType = 'firebase';
+                publicUrl = buildMediaUrl(mediaId);
+            } catch (firebaseError) {
+                console.warn('Firebase Storage upload failed, using local fallback:', firebaseError.message);
+                storageType = 'local';
+                const absoluteFolder = path.join(LOCAL_UPLOAD_ROOT, mediaType === 'image' ? 'images' : 'videos', category);
+                fs.mkdirSync(absoluteFolder, { recursive: true });
+                const absoluteFilePath = path.join(absoluteFolder, `${mediaId}${ext}`);
+                fs.writeFileSync(absoluteFilePath, file.buffer);
+                localPath = absoluteFilePath;
+                publicUrl = buildMediaUrl(mediaId);
+            }
         }
 
         const mediaDoc = {
             id: mediaId,
             type: mediaType,
             originalName: file.originalname,
-            filePath: remoteFilePath,
+            filePath: storagePath,
             url: publicUrl,
             size: file.size,
             mimeType: file.mimetype,
@@ -97,7 +151,7 @@ const uploadMedia = asyncHandler(async(req, res) => {
 
     res.status(201).json({
         success: true,
-        message: `${uploaded.length} file(s) uploaded successfully to Firebase Storage.`,
+        message: `${uploaded.length} file(s) uploaded successfully to Supabase Storage.`,
         uploaded,
         ...(errors.length && { errors }),
     });
@@ -180,6 +234,13 @@ const getMediaContent = asyncHandler(async(req, res) => {
         }
     }
 
+    if (media.storageType === 'supabase') {
+        const publicUrl = media.publicUrl || buildSupabasePublicUrl(media.filePath);
+        if (publicUrl) {
+            return res.redirect(publicUrl);
+        }
+    }
+
     if (media.url) {
         return res.redirect(media.url);
     }
@@ -213,6 +274,10 @@ const deleteMedia = asyncHandler(async(req, res) => {
     if (doc.data().storageType === 'local' && doc.data().localPath) {
         const absoluteLocalPath = doc.data().localPath;
         try { fs.unlinkSync(absoluteLocalPath); } catch (_) {}
+    } else if (doc.data().storageType === 'supabase') {
+        try {
+            await deleteFromSupabase(doc.data().filePath);
+        } catch (_) {}
     } else {
         try {
             ensureFirebaseStorage();
