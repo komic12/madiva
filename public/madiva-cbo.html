@@ -5382,7 +5382,6 @@
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-finance',this)"><span class="nav-icon"><i class="bi bi-cash-stack"></i></span> Finance</a></li>
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-reports',this)"><span class="nav-icon"><i class="bi bi-bar-chart-fill"></i></span> Reports</a></li>
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-settings',this)"><span class="nav-icon"><i class="bi bi-gear-fill"></i></span> Settings</a></li>
-                    <li><a href="javascript:void(0)" onclick="showPanel('admin-activities',this)"><span class="nav-icon"><i class="bi bi-calendar-event-fill"></i></span> Activities</a></li>
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-approvals',this)"><span class="nav-icon"><i class="bi bi-check-circle-fill"></i></span> Hour Approvals</a></li>
                     <li><a href="javascript:void(0)" onclick="showPanel('admin-campaigns',this)"><span class="nav-icon"><i class="bi bi-megaphone-fill"></i></span> Campaigns</a></li>
                 </ul>
@@ -5477,12 +5476,6 @@
                                 <button class="qa-btn" onclick="showPanel('admin-programs',null)"><span class="qa-icon"><i class="bi bi-journal-bookmark-fill"></i></span>Programs</button>
                                 <button class="qa-btn" onclick="showPanel('admin-finance',null)"><span class="qa-icon"><i class="bi bi-credit-card-fill"></i></span>Finance</button>
                             </div>
-                        </div>
-                    </div>
-                    <div class="dash-card">
-                        <h3>Recent Activity</h3>
-                        <div class="activity-list" id="admin-activity">
-                            <p class="ui-15">No activity yet. Activity will appear here as members register and engage.</p>
                         </div>
                     </div>
                 </div>
@@ -5661,18 +5654,6 @@
                         <div class="form-group"><label>Social Media (Facebook)</label><input value="@madivacbo"></div>
                         <div class="form-group"><label>WhatsApp Number</label><input value="+254 700 000 000"></div>
                         <button class="btn btn-primary btn-sm" onclick="saveAdminSettings()">Save Changes</button>
-                    </div>
-                </div>
-
-                <div class="dash-panel" id="admin-activities">
-                    <div class="dash-card full-width">
-                        <div class="ui-16">
-                            <h3>Ongoing Activities</h3>
-                            <button class="btn btn-primary btn-sm" onclick="showAddActivityForm()">+ Add Activity</button>
-                        </div>
-                        <div id="activities-list" class="ui-23">
-                            <p class="ui-19">Loading activities...</p>
-                        </div>
                     </div>
                 </div>
 
@@ -6291,10 +6272,6 @@
                     label: 'Settings',
                     icon: 'bi-gear-fill'
                 }, {
-                    panel: 'admin-activities',
-                    label: 'Activities',
-                    icon: 'bi-calendar-event-fill'
-                }, {
                     panel: 'admin-approvals',
                     label: 'Hour Approvals',
                     icon: 'bi-check-circle-fill'
@@ -6400,7 +6377,6 @@
             if (panelId === 'admin-finance') loadAdminFinance();
             if (panelId === 'admin-programs') loadAdminPrograms();
             if (panelId === 'admin-approvals') loadPendingApprovals();
-            if (panelId === 'admin-activities') loadActivities();
             if (panelId === 'admin-campaigns') {
                 loadCampaigns();
                 loadCampaignsForDropdown();
@@ -6657,91 +6633,6 @@
                 document.getElementById('manual-donor-name').value = '';
                 document.getElementById('manual-donor-email').value = '';
                 loadAdminFinance();
-            }
-        }
-
-        async function loadActivities() {
-            const data = await apiCall('/activities', 'GET', null, true);
-            if (!data.success) return;
-            const container = document.getElementById('activities-list');
-            if (!container) return;
-            container.innerHTML = data.activities.length ? data.activities.map(a => `
-    <div class="activity-card">
-      <div  class="ui-20">
-        <div>
-          <h4>${a.title}</h4>
-          <p  class="ui-21">${a.description}</p>
-          <p  class="ui-22">📅 ${new Date(a.date).toLocaleDateString('en-KE')} | 📍 ${a.location}</p>
-        </div>
-        <div  class="ui-23">
-          <button class="action-btn" onclick="editActivity('${a.id}', '${a.title}', '${a.description}', '${a.date}', '${a.location}', '${a.category}')">✏️</button>
-          <button class="action-btn" onclick="deleteActivity('${a.id}', '${a.title}')">🗑️</button>
-        </div>
-      </div>
-    </div>`).join('') : '<p  class="ui-24">No activities yet.</p>';
-        }
-
-        function showAddActivityForm() {
-            if (!document.getElementById('dashboard').classList.contains('open')) {
-                openDashboard('admin');
-            }
-            showPanel('admin-activities', null);
-            document.getElementById('activity-modal-title').textContent = 'Add Activity';
-            document.getElementById('activity-title').value = '';
-            document.getElementById('activity-description').value = '';
-            document.getElementById('activity-date').value = '';
-            document.getElementById('activity-location').value = '';
-            document.getElementById('activity-modal-overlay').style.display = 'flex';
-            document.getElementById('activity-modal-overlay').dataset.activityId = '';
-        }
-
-        function editActivity(id, title, desc, date, loc, cat) {
-            if (!document.getElementById('dashboard').classList.contains('open')) {
-                openDashboard('admin');
-            }
-            showPanel('admin-activities', null);
-            document.getElementById('activity-modal-title').textContent = 'Edit Activity';
-            document.getElementById('activity-title').value = title;
-            document.getElementById('activity-description').value = desc;
-            document.getElementById('activity-date').value = date;
-            document.getElementById('activity-location').value = loc;
-            document.getElementById('activity-modal-overlay').style.display = 'flex';
-            document.getElementById('activity-modal-overlay').dataset.activityId = id;
-        }
-
-        async function saveActivity() {
-            const id = document.getElementById('activity-modal-overlay').dataset.activityId;
-            const title = document.getElementById('activity-title').value.trim();
-            const description = document.getElementById('activity-description').value.trim();
-            const date = document.getElementById('activity-date').value;
-            const location = document.getElementById('activity-location').value.trim();
-            if (!title || !date || !location) return showToast('Fill all required fields.', 'error');
-            const payload = {
-                title,
-                description,
-                date,
-                location
-            };
-            const data = id ? await apiCall(`/activities/${id}`, 'PATCH', payload, true) : await apiCall('/activities', 'POST', payload, true);
-            if (data.success) {
-                showToast('Activity saved.', 'success');
-                closeActivityModal();
-                loadActivities();
-                loadActivitiesOnHomepage();
-            }
-        }
-
-        function closeActivityModal() {
-            document.getElementById('activity-modal-overlay').style.display = 'none';
-        }
-
-        async function deleteActivity(id, title) {
-            if (!confirm(`Delete "${title}"?`)) return;
-            const data = await apiCall(`/activities/${id}`, 'DELETE', null, true);
-            if (data.success) {
-                showToast('Activity deleted.', 'success');
-                loadActivities();
-                loadActivitiesOnHomepage();
             }
         }
 
@@ -8084,9 +7975,6 @@ async function initiateMpesaPay() {
                 window.deleteMember = deleteMember;
                 window.saveMember = saveMember;
                 window.closeMemberModal = closeMemberModal;
-                window.showAddActivityForm = showAddActivityForm;
-                window.saveActivity = saveActivity;
-                window.closeActivityModal = closeActivityModal;
                 window.showAddCampaignForm = showAddCampaignForm;
                 window.saveCampaign = saveCampaign;
                 window.closeCampaignModal = closeCampaignModal;
