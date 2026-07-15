@@ -2,9 +2,15 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const { bucket, collections, USE_FIREBASE, ensureFirebaseStorage } = require('../config/firebase');
+const {
+    uploadFile,
+    deleteFile,
+    createSignedUrl,
+    listFiles,
+    isSupabaseEnabled,
+} = require('../config/supabase');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 const LOCAL_UPLOAD_ROOT = path.join(os.tmpdir(), 'madiva-cbo', 'uploads');
@@ -24,60 +30,67 @@ function transformMediaItem(media) {
 const ALLOWED_IMAGES = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 const ALLOWED_VIDEOS = ['.mp4', '.mov', '.avi', '.webm', '.mkv'];
 
-function buildSupabasePublicUrl(objectPath) {
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_BUCKET) return '';
-    const baseUrl = process.env.SUPABASE_URL.replace(/\/$/, '');
-    return `${baseUrl}/storage/v1/object/public/${encodeURIComponent(process.env.SUPABASE_BUCKET)}/${encodeURIComponent(objectPath)}`;
+function normalizeExternalUrl(rawUrl) {
+    try {
+        return new URL(rawUrl).toString();
+    } catch {
+        return '';
+    }
 }
 
-async function uploadToSupabase(file, objectPath) {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ANON_KEY;
-    const bucketName = process.env.SUPABASE_BUCKET;
-
-    if (!supabaseUrl || !serviceKey || !bucketName) {
-        throw new Error('Supabase storage configuration is incomplete.');
+function getExternalMediaType(url) {
+    if (/\.(jpe?g|png|gif|webp|bmp|svg)(\?|$)/i.test(url)) {
+        return 'image';
     }
-
-    const response = await axios.post(`${supabaseUrl.replace(/\/$/, '')}/storage/v1/object/${encodeURIComponent(bucketName)}/${encodeURIComponent(objectPath)}`, file.buffer, {
-        headers: {
-            'Content-Type': file.mimetype || 'application/octet-stream',
-            apikey: serviceKey,
-            Authorization: `Bearer ${serviceKey}`,
-            'x-upsert': 'true',
-        },
-    });
-
-    if (response.status < 200 || response.status >= 300) {
-        throw new Error(`Supabase upload failed with status ${response.status}`);
+    if (/youtube\.com|youtu\.be|vimeo\.com|facebook\.com|instagram\.com|tiktok\.com|twitter\.com|x\.com/i.test(url)) {
+        return 'video';
     }
-
-    return buildSupabasePublicUrl(objectPath);
-}
-
-async function deleteFromSupabase(objectPath) {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ANON_KEY;
-    const bucketName = process.env.SUPABASE_BUCKET;
-
-    if (!supabaseUrl || !serviceKey || !bucketName || !objectPath) return;
-
-    await axios.delete(`${supabaseUrl.replace(/\/$/, '')}/storage/v1/object/${encodeURIComponent(bucketName)}/${encodeURIComponent(objectPath)}`, {
-        headers: {
-            apikey: serviceKey,
-            Authorization: `Bearer ${serviceKey}`,
-        },
-    });
+    return 'video';
 }
 
 // POST /api/media/upload
 const uploadMedia = asyncHandler(async(req, res) => {
-    if (!req.files || req.files.length === 0)
-        return res.status(400).json({ success: false, message: 'No files uploaded.' });
-
     const { category = 'general', caption = '', program = '' } = req.body;
-    const uploaded = [],
-        errors = [];
+    const externalUrl = normalizeExternalUrl((req.body.link || req.body.externalUrl || '').trim());
+    const uploaded = [];
+    const errors = [];
+
+    if ((!req.files || req.files.length === 0) && !externalUrl) {
+        return res.status(400).json({ success: false, message: 'No files or links uploaded.' });
+    }
+
+    if (externalUrl) {
+        const mediaId = uuidv4();
+        const mediaType = getExternalMediaType(externalUrl);
+        const mediaDoc = {
+            id: mediaId,
+            type: mediaType,
+            originalName: externalUrl,
+            filePath: null,
+            url: externalUrl,
+            size: 0,
+            mimeType: null,
+            category,
+            program,
+            caption,
+            uploadedBy: req.user.uid,
+            uploaderName: req.user.name,
+            isPublished: true,
+            storageType: 'external',
+            externalUrl,
+            createdAt: new Date().toISOString(),
+        };
+
+        await collections.media.doc(mediaId).set(mediaDoc);
+        await collections.activity.add({
+            type: 'media_uploaded',
+            description: `External media link added: ${externalUrl}`,
+            userId: req.user.uid,
+            timestamp: new Date().toISOString(),
+        });
+
+        uploaded.push(mediaDoc);
+    }
 
     for (const file of req.files) {
         const ext = path.extname(file.originalname).toLowerCase();
@@ -98,7 +111,8 @@ const uploadMedia = asyncHandler(async(req, res) => {
         let storagePath = remoteFilePath;
 
         try {
-            publicUrl = await uploadToSupabase(file, remoteFilePath);
+            await uploadFile(remoteFilePath, file.buffer, file.mimetype);
+            publicUrl = buildMediaUrl(mediaId);
         } catch (supabaseError) {
             console.warn('Supabase Storage upload failed, trying Firebase fallback:', supabaseError.message);
             try {
@@ -149,12 +163,33 @@ const uploadMedia = asyncHandler(async(req, res) => {
         uploaded.push(mediaDoc);
     }
 
+    const messageParts = [];
+    if (uploaded.length) {
+        messageParts.push(`${uploaded.length} item(s) uploaded`);
+    }
+    if (errors.length) {
+        messageParts.push(`${errors.length} failed`);
+    }
+
     res.status(201).json({
-        success: true,
-        message: `${uploaded.length} file(s) uploaded successfully to Supabase Storage.`,
+        success: uploaded.length > 0,
+        message: messageParts.length ? messageParts.join(', ') : 'No media uploaded.',
         uploaded,
         ...(errors.length && { errors }),
     });
+});
+
+const checkSupabaseConnection = asyncHandler(async(req, res) => {
+    if (!isSupabaseEnabled()) {
+        return res.status(400).json({ success: false, message: 'Supabase storage is not configured.' });
+    }
+
+    try {
+        const files = await listFiles('', { limit: 1 });
+        return res.json({ success: true, message: 'Connected to Supabase Storage.', data: files });
+    } catch (error) {
+        return res.status(502).json({ success: false, message: `Supabase connection failed: ${error.message}` });
+    }
 });
 
 // GET /api/media
@@ -234,10 +269,16 @@ const getMediaContent = asyncHandler(async(req, res) => {
         }
     }
 
+    if (media.storageType === 'external' && media.externalUrl) {
+        return res.redirect(media.externalUrl);
+    }
+
     if (media.storageType === 'supabase') {
-        const publicUrl = media.publicUrl || buildSupabasePublicUrl(media.filePath);
-        if (publicUrl) {
-            return res.redirect(publicUrl);
+        try {
+            const signedUrl = await createSignedUrl(media.filePath, 60);
+            return res.redirect(signedUrl);
+        } catch (signedError) {
+            console.warn('Supabase signed URL generation failed:', signedError.message);
         }
     }
 
@@ -276,7 +317,7 @@ const deleteMedia = asyncHandler(async(req, res) => {
         try { fs.unlinkSync(absoluteLocalPath); } catch (_) {}
     } else if (doc.data().storageType === 'supabase') {
         try {
-            await deleteFromSupabase(doc.data().filePath);
+            await deleteFile(doc.data().filePath);
         } catch (_) {}
     } else {
         try {
@@ -288,4 +329,4 @@ const deleteMedia = asyncHandler(async(req, res) => {
     res.json({ success: true, message: 'Media deleted.' });
 });
 
-module.exports = { uploadMedia, getMedia, getMediaStats, getMediaContent, getMediaItem, updateMedia, deleteMedia };
+module.exports = { uploadMedia, getMedia, getMediaStats, getMediaContent, getMediaItem, updateMedia, deleteMedia, checkSupabaseConnection };

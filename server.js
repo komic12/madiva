@@ -140,6 +140,7 @@ app.get('/api/media', media.getMedia);
 app.get('/api/media/stats', protect, authorize('admin'), media.getMediaStats);
 app.get('/api/media/:id/content', media.getMediaContent);
 app.get('/api/media/:id', media.getMediaItem);
+app.get('/api/media/supabase/check', protect, authorize('admin'), media.checkSupabaseConnection);
 app.patch('/api/media/:id', protect, authorize('admin'), media.updateMedia);
 app.delete('/api/media/:id', protect, authorize('admin'), media.deleteMedia);
 

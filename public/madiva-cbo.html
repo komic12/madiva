@@ -5773,6 +5773,11 @@
                                 <label>Caption (optional)</label>
                                 <input type="text" id="upload-caption" placeholder="e.g. Hairdressing graduation ceremony 2025">
                             </div>
+                            <div class="form-group ui-12">
+                                <label>External media link</label>
+                                <input type="url" id="upload-link" placeholder="Paste YouTube, Facebook, Instagram or other media URL" oninput="updateUploadStatus()">
+                                <small>Use this when uploading from a link instead of a file.</small>
+                            </div>
                             <div class="ui-26">
                                 <button class="btn btn-primary btn-sm" id="upload-btn" onclick="uploadFiles()" disabled>⬆ Upload</button>
                             </div>
@@ -5786,6 +5791,7 @@
                             <button class="filter-btn active" onclick="filterAdminMedia('all',this)">All</button>
                             <button class="filter-btn" onclick="filterAdminMedia('image',this)">Photos</button>
                             <button class="filter-btn" onclick="filterAdminMedia('video',this)">Videos</button>
+                            <button class="btn btn-secondary btn-xs" onclick="checkSupabaseConnection()">Check Supabase</button>
                         </div>
                         <div class="media-grid" id="admin-media-grid">
                             <div class="ui-28">Loading media…</div>
@@ -8185,8 +8191,18 @@ function handleDrop(event) {
 function addFilesToQueue(files) {
   filesToUpload = [...filesToUpload, ...files].slice(0, 20);
   renderPreviews();
-  document.getElementById('upload-btn').disabled = filesToUpload.length === 0;
-  document.getElementById('upload-status').textContent = `${filesToUpload.length} file(s) selected`;
+  updateUploadStatus();
+}
+function updateUploadStatus() {
+  const btn = document.getElementById('upload-btn');
+  const status = document.getElementById('upload-status');
+  const link = document.getElementById('upload-link').value.trim();
+  btn.disabled = filesToUpload.length === 0 && !link;
+  status.textContent = filesToUpload.length
+    ? `${filesToUpload.length} file(s) selected`
+    : link
+      ? 'Ready to upload external link'
+      : '';
 }
 function renderPreviews() {
   const container = document.getElementById('upload-preview');
@@ -8204,13 +8220,12 @@ function renderPreviews() {
 function removePreview(index) {
   filesToUpload.splice(index, 1);
   renderPreviews();
-  document.getElementById('upload-btn').disabled = filesToUpload.length === 0;
-  document.getElementById('upload-status').textContent =
-    filesToUpload.length ? `${filesToUpload.length} file(s) selected` : '';
+  updateUploadStatus();
 }
 
 async function uploadFiles() {
-  if (!filesToUpload.length) return;
+  const externalLink = document.getElementById('upload-link').value.trim();
+  if (!filesToUpload.length && !externalLink) return;
   const category = document.getElementById('upload-category').value;
   const caption  = document.getElementById('upload-caption').value;
   const btn      = document.getElementById('upload-btn');
@@ -8227,6 +8242,10 @@ async function uploadFiles() {
   filesToUpload.forEach(f => formData.append('files', f));
   formData.append('category', category);
   formData.append('caption', caption);
+  const externalLink = document.getElementById('upload-link').value.trim();
+  if (externalLink) {
+    formData.append('link', externalLink);
+  }
 
   try {
     fill.style.width = '40%';
@@ -8245,6 +8264,8 @@ async function uploadFiles() {
       filesToUpload = [];
       renderPreviews();
       document.getElementById('upload-caption').value = '';
+      document.getElementById('upload-link').value = '';
+      updateUploadStatus();
       loadAdminMedia();
       loadPublicGallery();
     } else {
@@ -8259,6 +8280,15 @@ async function uploadFiles() {
   setTimeout(() => { progress.style.display = 'none'; fill.style.width = '0%'; }, 1200);
   btn.disabled = false;
   btn.textContent = '⬆ Upload';
+}
+
+async function checkSupabaseConnection() {
+  const data = await apiCall('/media/supabase/check', 'GET', null, true);
+  if (data.success) {
+    showToast('✅ Supabase is connected.');
+  } else {
+    showToast(`❌ Supabase check failed: ${data.message || 'Unknown error'}`, 'error');
+  }
 }
 
 async function loadAdminMedia() {
