@@ -10,49 +10,19 @@ const buildCampaignPayload = (data = {}) => {
     if (data.deadline !== undefined) payload.deadline = data.deadline;
     if (data.category !== undefined) payload.category = data.category;
     if (data.image !== undefined) payload.image = data.image;
+    if (data.status !== undefined) payload.status = data.status;
+    if (data.totalEnrolled !== undefined) payload.totalEnrolled = Number(data.totalEnrolled || 0);
+    if (data.completionRate !== undefined) payload.completionRate = Number(data.completionRate || 0);
+    if (data.employmentRate !== undefined) payload.employmentRate = Number(data.employmentRate || 0);
+    if (data.duration !== undefined) payload.duration = Number(data.duration || 0);
     return payload;
-};
-
-const seedDefaultCampaigns = async(source) => {
-    const defaults = [{
-            title: 'Vocational Skills Program',
-            description: 'Upskilling young women and youth in hairdressing, beauty therapy, and entrepreneurship.',
-            targetAmount: 500000,
-            currentAmount: 240000,
-            deadline: '2026-12-31',
-            category: 'Vocational Skills',
-            status: 'active',
-            createdAt: new Date().toISOString(),
-        },
-        {
-            title: 'Financial Literacy Drive',
-            description: 'Helping families build savings habits, budget better, and start small income-generating activities.',
-            targetAmount: 300000,
-            currentAmount: 132500,
-            deadline: '2026-10-30',
-            category: 'Economic Empowerment',
-            status: 'active',
-            createdAt: new Date().toISOString(),
-        },
-    ];
-
-    for (const item of defaults) {
-        const id = `campaign_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-        await source.doc(id).set({ id, ...item });
-    }
 };
 
 // GET /api/campaigns
 const getCampaigns = asyncHandler(async(req, res) => {
     const source = collections.campaigns || collections.programs;
     const snapshot = await source.get();
-    let campaigns = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    if (!campaigns.length) {
-        await seedDefaultCampaigns(source);
-        const refreshed = await source.get();
-        campaigns = refreshed.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    }
+    const campaigns = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     res.json({ success: true, campaigns });
 });

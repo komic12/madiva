@@ -4892,10 +4892,10 @@
                         <h2>Find Us in Suneka Wrongside, Kisii</h2>
                         <p>MADIVA CBO is based in Suneka Wrongside, Kisii County — at the heart of the communities we serve.</p>
                         <div class="map-details">
-                            <div class="map-detail-item"><span class="icon"></span><span>Suneka, Kisii County, Kenya</span></div>
+                            <div class="map-detail-item"><span class="icon"></span><span id="page-location">Suneka, Kisii County, Kenya</span></div>
                             <div class="map-detail-item"><span class="icon"></span><span>Mon – Fri: 8:00 AM – 5:00 PM</span></div>
-                            <div class="map-detail-item"><span class="icon"></span><span>info@madivacbo.org</span></div>
-                            <div class="map-detail-item"><span class="icon"></span><span>WhatsApp: +254 700 685 000</span></div>
+                            <div class="map-detail-item"><span class="icon"></span><span id="page-email">info@madivacbo.org</span></div>
+                            <div class="map-detail-item"><span class="icon"></span><span id="page-whatsapp">WhatsApp: +254 700 685 000</span></div>
                         </div>
                     </div>
                     <div class="map-embed">
@@ -4928,14 +4928,14 @@
                                 <div class="contact-icon ci-r"><i class="bi bi-envelope-fill"></i></div>
                                 <div>
                                     <strong>Email</strong>
-                                    <span>madivacbo@gmail.com</span>
+                                    <span id="contact-email">madivacbo@gmail.com</span>
                                 </div>
                             </div>
                             <div class="contact-item">
                                 <div class="contact-icon ci-b"><i class="bi bi-phone-fill"></i></div>
                                 <div>
                                     <strong>Social Media</strong>
-                                    <span><a href="https://facebook.com/groups/1510263679852073/" target="_blank" rel="noopener noreferrer">Facebook</a> · <a href="https://wa.me/254700685259?text=Hello%20MADIVA%20CBO!%20I%20would%20like%20to%20learn%20more%20about%20your%20programs." target="_blank" rel="noopener noreferrer">WhatsApp</a></span>
+                                    <span id="contact-social"><a href="https://facebook.com/groups/1510263679852073/" target="_blank" rel="noopener noreferrer">Facebook</a> · <a href="https://wa.me/254700685259?text=Hello%20MADIVA%20CBO!%20I%20would%20like%20to%20learn%20more%20about%20your%20programs." target="_blank" rel="noopener noreferrer">WhatsApp</a></span>
                                 </div>
                             </div>
                         </div>
@@ -6386,6 +6386,12 @@
                 loadCampaigns();
                 loadCampaignsForDropdown();
             }
+            if (panelId === 'admin-reports') {
+                loadAdminReports();
+            }
+            if (panelId === 'admin-settings') {
+                loadAdminSettings();
+            }
             if (panelId === 'sponsor-overview') loadSponsorOverview();
             if (panelId === 'sponsor-history') loadDonationHistory();
             if (panelId === 'sponsor-impact') loadSponsorOverview(); // impact data comes from same summary
@@ -6398,6 +6404,133 @@
             if (panelId === 'vol-profile') loadVolunteerProfile();
 
             closeSidebar();
+        }
+
+        async function loadAdminReports() {
+            const [summaryData, monthlyData, dailyData] = await Promise.all([
+                apiCall('/donations/summary', 'GET', null, true),
+                apiCall('/donations/monthly-summary', 'GET', null, true),
+                apiCall('/donations/daily-summary', 'GET', null, true),
+            ]);
+
+            const monthlyContainer = document.getElementById('monthly-bars');
+            const dailyContainer = document.getElementById('daily-bars');
+            if (monthlyContainer) {
+                if (monthlyData.success && monthlyData.months ? .length) {
+                    monthlyContainer.innerHTML = monthlyData.months.map(item => `
+                        <div class="chart-bar"><span>${escapeHtml(item.month)}</span><strong>KES ${Number(item.total || 0).toLocaleString()}</strong></div>
+                    `).join('');
+                } else {
+                    monthlyContainer.innerHTML = '<p class="ui-19">No monthly donation data yet.</p>';
+                }
+            }
+
+            if (dailyContainer) {
+                if (dailyData.success && dailyData.days ? .length) {
+                    dailyContainer.innerHTML = dailyData.days.map(item => `
+                        <div class="chart-bar"><span>Day ${item.day}</span><strong>KES ${Number(item.total || 0).toLocaleString()}</strong></div>
+                    `).join('');
+                } else {
+                    dailyContainer.innerHTML = '<p class="ui-19">No daily donation data yet.</p>';
+                }
+            }
+
+            if (summaryData.success) {
+                const summary = summaryData.summary || {};
+                const reportsList = document.getElementById('saved-reports-list');
+                if (reportsList) {
+                    const savedReports = JSON.parse(localStorage.getItem('madiva_saved_reports') || '[]');
+                    reportsList.innerHTML = savedReports.length ? savedReports.map(report => `
+                        <div class="act-item">
+                            <div class="act-info">
+                                <strong>${escapeHtml(report.title)}</strong>
+                                <span>${escapeHtml(report.summary)} • ${new Date(report.generatedAt).toLocaleDateString('en-KE')}</span>
+                            </div>
+                            <button class="btn btn-outline btn-sm ui-14" onclick="generateAndSaveReport('${report.type}')">Refresh</button>
+                        </div>
+                    `).join('') : '<p class="ui-15">No saved reports yet. Generate one to get started!</p>';
+                }
+            }
+        }
+
+        async function generateAndSaveReport(type = 'impact') {
+            const [summaryData, dashboardData, campaignsData, sponsorData] = await Promise.all([
+                apiCall('/donations/summary', 'GET', null, true),
+                apiCall('/admin/dashboard', 'GET', null, true),
+                apiCall('/campaigns', 'GET', null, true),
+                apiCall('/admin/users?role=sponsor&limit=100', 'GET', null, true),
+            ]);
+
+            const summary = summaryData.success ? summaryData.summary || {} : {};
+            const dashboard = dashboardData.success ? dashboardData.dashboard || {} : {};
+            const campaigns = campaignsData.success ? campaignsData.campaigns || [] : [];
+            const sponsors = sponsorData.success ? sponsorData.users || [] : [];
+
+            const reportTypes = {
+                impact: {
+                    title: 'Impact Report',
+                    summary: `Raised KES ${Number(summary.totalRaised || 0).toLocaleString()} through ${campaigns.length} programs with ${Number(dashboard.activeVolunteers || 0)} active volunteers.`,
+                    content: `MADIVA CBO Impact Report\nGenerated: ${new Date().toLocaleString('en-KE')}\n\nTotal raised: KES ${Number(summary.totalRaised || 0).toLocaleString()}\nThis month: KES ${Number(summary.thisMonthTotal || 0).toLocaleString()}\nPrograms managed: ${campaigns.length}\nActive volunteers: ${dashboard.activeVolunteers || 0}\nSponsors: ${sponsors.length}`
+                },
+                members: {
+                    title: 'Members Report',
+                    summary: `${Number(dashboard.totalMembers || 0)} members and ${Number(dashboard.activeVolunteers || 0)} active volunteers currently engaged.`,
+                    content: `MADIVA CBO Members Report\nGenerated: ${new Date().toLocaleString('en-KE')}\n\nTotal members: ${dashboard.totalMembers || 0}\nActive volunteers: ${dashboard.activeVolunteers || 0}\nSponsors: ${sponsors.length}`
+                },
+                finance: {
+                    title: 'Finance Report',
+                    summary: `KES ${Number(summary.totalRaised || 0).toLocaleString()} total raised and ${Number(summary.thisMonthTotal || 0).toLocaleString()} this month.`,
+                    content: `MADIVA CBO Finance Report\nGenerated: ${new Date().toLocaleString('en-KE')}\n\nTotal raised: KES ${Number(summary.totalRaised || 0).toLocaleString()}\nThis month: KES ${Number(summary.thisMonthTotal || 0).toLocaleString()}\nPending donations: ${summary.totalCount || 0}`
+                },
+                programs: {
+                    title: 'Programs Report',
+                    summary: `${campaigns.length} programs active with ${campaigns.reduce((sum, p) => sum + (p.totalEnrolled || 0), 0)} enrolled participants.`,
+                    content: `MADIVA CBO Programs Report\nGenerated: ${new Date().toLocaleString('en-KE')}\n\nPrograms: ${campaigns.length}\nTotal enrolled: ${campaigns.reduce((sum, p) => sum + (p.totalEnrolled || 0), 0)}\nAverage completion: ${campaigns.length ? Math.round(campaigns.reduce((sum, p) => sum + (p.completionRate || 0), 0) / campaigns.length) : 0}%`
+                }
+            };
+
+            const report = reportTypes[type] || reportTypes.impact;
+            const savedReports = JSON.parse(localStorage.getItem('madiva_saved_reports') || '[]');
+            const entry = {
+                id: `${type}-${Date.now()}`,
+                type,
+                title: report.title,
+                summary: report.summary,
+                content: report.content,
+                generatedAt: new Date().toISOString(),
+            };
+            savedReports.unshift(entry);
+            localStorage.setItem('madiva_saved_reports', JSON.stringify(savedReports.slice(0, 6)));
+
+            const blob = new Blob([entry.content], {
+                type: 'text/plain;charset=utf-8'
+            });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${type}-report-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            renderSavedReports();
+            showToast(`${report.title} generated.`, 'success');
+        }
+
+        function renderSavedReports() {
+            const container = document.getElementById('saved-reports-list');
+            if (!container) return;
+            const savedReports = JSON.parse(localStorage.getItem('madiva_saved_reports') || '[]');
+            container.innerHTML = savedReports.length ? savedReports.map(report => `
+                <div class="act-item">
+                    <div class="act-info">
+                        <strong>${escapeHtml(report.title)}</strong>
+                        <span>${escapeHtml(report.summary)} • ${new Date(report.generatedAt).toLocaleDateString('en-KE')}</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm ui-14" onclick="generateAndSaveReport('${report.type}')">Refresh</button>
+                </div>
+            `).join('') : '<p class="ui-15">No saved reports yet. Generate one to get started!</p>';
         }
 
         /* ── Admin: load dashboard metrics ──────────── */
@@ -6497,6 +6630,51 @@
           </div>
         </div>`).join('') : '<p  class="ui-18">No activity yet. Activity will appear here as members register and engage.</p>';
             }
+        }
+
+        function getStoredOrgSettings() {
+            try {
+                return JSON.parse(localStorage.getItem('madiva_org_settings') || 'null') || {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function applyOrgSettings(settings = {}) {
+            const values = {
+                orgName: settings.orgName || 'MADIVA CBO',
+                location: settings.location || 'Suneka, Kisii County, Kenya',
+                email: settings.email || 'info@madivacbo.org',
+                phone: settings.phone || '+254 700 000 000',
+                facebook: settings.facebook || '@madivacbo',
+                whatsapp: settings.whatsapp || '+254 700 000 000',
+            };
+
+            const panel = document.getElementById('admin-settings');
+            if (panel) {
+                const inputs = panel.querySelectorAll('input');
+                if (inputs[0]) inputs[0].value = values.orgName;
+                if (inputs[1]) inputs[1].value = values.location;
+                if (inputs[2]) inputs[2].value = values.email;
+                if (inputs[3]) inputs[3].value = values.phone;
+                if (inputs[4]) inputs[4].value = values.facebook;
+                if (inputs[5]) inputs[5].value = values.whatsapp;
+            }
+
+            const locationEl = document.getElementById('page-location');
+            if (locationEl) locationEl.textContent = values.location;
+            const emailEl = document.getElementById('page-email');
+            if (emailEl) emailEl.textContent = values.email;
+            const whatsappEl = document.getElementById('page-whatsapp');
+            if (whatsappEl) whatsappEl.textContent = `WhatsApp: ${values.whatsapp}`;
+            const contactEmailEl = document.getElementById('contact-email');
+            if (contactEmailEl) contactEmailEl.textContent = values.email;
+            const contactSocialEl = document.getElementById('contact-social');
+            if (contactSocialEl) contactSocialEl.innerHTML = `<a href="https://facebook.com/${encodeURIComponent(values.facebook || 'madivacbo')}" target="_blank" rel="noopener noreferrer">Facebook</a> · <a href="https://wa.me/${encodeURIComponent(values.whatsapp || '+254700000000')}" target="_blank" rel="noopener noreferrer">WhatsApp</a>`;
+        }
+
+        function loadAdminSettings() {
+            applyOrgSettings(getStoredOrgSettings());
         }
 
         /* ── Admin: load members table ──────────────── */
@@ -6641,6 +6819,15 @@
             }
         }
 
+        function escapeHtml(value = '') {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         async function loadCampaigns() {
             const data = await apiCall('/campaigns', 'GET', null, true);
             if (!data.success) return;
@@ -6653,16 +6840,16 @@
                 return `
       <div class="campaign-card">
         <div  class="ui-25">
-          <h4>${c.title}</h4>
+          <h4>${escapeHtml(c.title || 'Untitled campaign')}</h4>
           <div  class="ui-23">
-            <button class="action-btn" onclick="editCampaign('${c.id}', '${c.title}', '${c.description}', ${c.targetAmount}, ${c.currentAmount}, '${c.deadline}', '${c.category}')">✏️</button>
-            <button class="action-btn" onclick="deleteCampaign('${c.id}', '${c.title}')">🗑️</button>
+            <button class="action-btn" onclick="editCampaign(${JSON.stringify(c.id)}, ${JSON.stringify(c.title || '')}, ${JSON.stringify(c.description || '')}, ${JSON.stringify(Number(c.targetAmount || 0))}, ${JSON.stringify(Number(c.currentAmount || 0))}, ${JSON.stringify(c.deadline || '')}, ${JSON.stringify(c.category || 'General Fund')})">✏️</button>
+            <button class="action-btn" onclick="deleteCampaign(${JSON.stringify(c.id)}, ${JSON.stringify(c.title || 'Campaign')})">🗑️</button>
           </div>
         </div>
-        <p  class="ui-26">${c.description}</p>
+        <p  class="ui-26">${escapeHtml(c.description || '')}</p>
         <div class="progress-bar-wrap"><div class="progress-bar-fill ui-17" ></div></div>
         <div  class="ui-27">
-          <span>KES ${Number(c.currentAmount).toLocaleString()} / ${Number(c.targetAmount).toLocaleString()}</span>
+          <span>KES ${Number(c.currentAmount || 0).toLocaleString()} / ${Number(c.targetAmount || 0).toLocaleString()}</span>
           <span>${progress}%</span>
         </div>
       </div>`;
@@ -6691,11 +6878,11 @@
             }
             showPanel('admin-campaigns', null);
             document.getElementById('campaign-modal-title').textContent = 'Edit Campaign';
-            document.getElementById('campaign-title').value = title;
-            document.getElementById('campaign-description').value = desc;
-            document.getElementById('campaign-target').value = target;
-            document.getElementById('campaign-current').value = current;
-            document.getElementById('campaign-deadline').value = deadline;
+            document.getElementById('campaign-title').value = title || '';
+            document.getElementById('campaign-description').value = desc || '';
+            document.getElementById('campaign-target').value = target || '';
+            document.getElementById('campaign-current').value = current || '0';
+            document.getElementById('campaign-deadline').value = deadline || '';
             document.getElementById('campaign-category').value = cat || 'General Fund';
             document.getElementById('campaign-modal-overlay').style.display = 'flex';
             document.getElementById('campaign-modal-overlay').dataset.campaignId = id;
@@ -6724,6 +6911,9 @@
                 closeCampaignModal();
                 loadCampaigns();
                 loadCampaignsOnHomepage();
+                loadAdminDashboard();
+                loadAdminPrograms();
+                loadCampaignsForDropdown();
             }
         }
 
@@ -6738,6 +6928,9 @@
                 showToast('Campaign deleted.', 'success');
                 loadCampaigns();
                 loadCampaignsOnHomepage();
+                loadAdminDashboard();
+                loadAdminPrograms();
+                loadCampaignsForDropdown();
             }
         }
 
@@ -6752,11 +6945,11 @@
                 const progress = target ? (current / target * 100).toFixed(0) : '0';
                 return `
       <div class="campaign-showcase-card">
-        <h3  class="ui-28">${c.title}</h3>
-        <p  class="ui-29">${c.description}</p>
+        <h3  class="ui-28">${escapeHtml(c.title || 'Untitled campaign')}</h3>
+        <p  class="ui-29">${escapeHtml(c.description || '')}</p>
         <div class="progress-bar-wrap"><div class="progress-bar-fill ui-17" ></div></div>
         <div  class="ui-30">
-          <span>KES ${Number(c.currentAmount).toLocaleString()} / ${Number(c.targetAmount).toLocaleString()}</span>
+          <span>KES ${Number(c.currentAmount || 0).toLocaleString()} / ${Number(c.targetAmount || 0).toLocaleString()}</span>
           <span  class="ui-31">${progress}%</span>
         </div>
       </div>`;
@@ -6916,14 +7109,14 @@
                     <tbody>
                         ${programs.map(p => `
                             <tr>
-                                <td>${p.title || 'Untitled'}</td>
+                                <td>${escapeHtml(p.title || 'Untitled')}</td>
                                 <td>${p.totalEnrolled || 0}</td>
                                 <td><span class="status-pill sp-active">${p.completionRate || 0}%</span></td>
                                 <td><span class="status-pill sp-complete">${p.employmentRate || 0}%</span></td>
-                                <td><span class="status-pill ${p.status === 'active' ? 'sp-active' : 'sp-pending'}">${p.status || 'active'}</span></td>
+                                <td><span class="status-pill ${p.status === 'active' ? 'sp-active' : 'sp-pending'}">${escapeHtml(p.status || 'active')}</span></td>
                                 <td  class="ui-33">
-                                    <button class="action-btn" onclick="editProgram('${p.id}')" title="Edit">✏️</button>
-                                    <button class="action-btn" onclick="deleteProgram('${p.id}', '${(p.title || '').replace(/'/g, "\\'")}')">🗑️</button>
+                                    <button class="action-btn" onclick="editProgram(${JSON.stringify(p.id)}, ${JSON.stringify(p.title || '')}, ${JSON.stringify(p.description || '')}, ${JSON.stringify(p.totalEnrolled || 0)}, ${JSON.stringify(p.completionRate || 0)}, ${JSON.stringify(p.employmentRate || 0)}, ${JSON.stringify(p.status || 'active')}, ${JSON.stringify(p.duration || 12)}, ${JSON.stringify(Number(p.targetAmount || 0))})" title="Edit">✏️</button>
+                                    <button class="action-btn" onclick="deleteProgram(${JSON.stringify(p.id)}, ${JSON.stringify(p.title || 'Program')})">🗑️</button>
                                 </td>
                             </tr>
                         `).join('')}
@@ -7016,7 +7209,7 @@
             let existing = document.getElementById('program-form-modal');
             if (existing) existing.remove();
             document.body.appendChild(modal);
-
+            modal.dataset.programId = '';
             document.getElementById('prog-form-name').focus();
         }
 
@@ -7029,6 +7222,8 @@
 
         /* ── Admin: Save New Program ────────────────── */
         async function saveNewProgram() {
+            const modal = document.getElementById('program-form-modal');
+            const id = modal?.dataset.programId || '';
             const name = document.getElementById('prog-form-name')?.value.trim();
             const desc = document.getElementById('prog-form-desc')?.value.trim();
             const target = Number(document.getElementById('prog-form-target')?.value || 50);
@@ -7041,7 +7236,7 @@
                 return showToast('Please enter a program name.', 'error');
             }
 
-            const data = await apiCall('/campaigns', 'POST', {
+            const payload = {
                 title: name,
                 description: desc,
                 targetAmount: target * 1000,
@@ -7051,19 +7246,106 @@
                 employmentRate: employment,
                 status,
                 totalEnrolled: 0
-            }, true);
+            };
+
+            const data = id ? await apiCall(`/campaigns/${id}`, 'PATCH', payload, true) : await apiCall('/campaigns', 'POST', payload, true);
 
             if (data.success) {
-                showToast(data.message || 'Program created successfully!', 'success');
+                showToast(data.message || (id ? 'Program updated successfully!' : 'Program created successfully!'), 'success');
                 closeProgramForm();
                 loadAdminPrograms();
+                loadCampaignsOnHomepage();
+                loadAdminDashboard();
+                loadCampaignsForDropdown();
             } else {
-                showToast(data.message || 'Error creating program.', 'error');
+                showToast(data.message || 'Error saving program.', 'error');
             }
         }
 
-        function editProgram(id) {
-            showToast('Edit program feature coming soon!', 'info');
+        function editProgram(id, title, desc, totalEnrolled, completionRate, employmentRate, status, duration, targetAmount) {
+            if (!document.getElementById('dashboard').classList.contains('open')) {
+                openDashboard('admin');
+            }
+            showPanel('admin-programs', null);
+
+            const modal = document.createElement('div');
+            modal.id = 'program-form-modal';
+            modal.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: white; border-radius: 16px; padding: 28px; z-index: 2000;
+                box-shadow: 0 20px 60px rgba(107, 33, 168, 0.3);
+                width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+            `;
+            
+            modal.innerHTML = `
+                <div  class="ui-35">
+                    <h2  class="ui-36">📚 Edit Program</h2>
+                    <button onclick="closeProgramForm()"  class="ui-37">✕</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Program Name *</label>
+                    <input id="prog-form-name" type="text" value="${escapeHtml(title || '')}" placeholder="e.g., Hairdressing Training"  class="ui-38">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="prog-form-desc" placeholder="Program details"  class="ui-39">${escapeHtml(desc || '')}</textarea>
+                </div>
+
+                <div  class="ui-40">
+                    <div class="form-group">
+                        <label>Target Enrollment</label>
+                        <input id="prog-form-target" type="number" value="${Number(targetAmount || 0) / 1000}" placeholder="e.g., 50" min="1"  class="ui-38">
+                    </div>
+                    <div class="form-group">
+                        <label>Duration (weeks)</label>
+                        <input id="prog-form-duration" type="number" value="${duration || 12}" placeholder="e.g., 12" min="1"  class="ui-38">
+                    </div>
+                </div>
+
+                <div  class="ui-40">
+                    <div class="form-group">
+                        <label>Completion Rate (%)</label>
+                        <input id="prog-form-completion" type="number" value="${completionRate || 0}" placeholder="0-100" min="0" max="100"  class="ui-38">
+                    </div>
+                    <div class="form-group">
+                        <label>Employment Rate (%)</label>
+                        <input id="prog-form-employment" type="number" value="${employmentRate || 0}" placeholder="0-100" min="0" max="100"  class="ui-38">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="prog-form-status"  class="ui-41">
+                        <option value="active" ${status === 'active' ? 'selected' : ''}>Active</option>
+                        <option value="completed" ${status === 'completed' ? 'selected' : ''}>Completed</option>
+                        <option value="paused" ${status === 'paused' ? 'selected' : ''}>Paused</option>
+                    </select>
+                </div>
+
+                <div  class="ui-42">
+                    <button class="btn btn-primary ui-5"  onclick="saveNewProgram()">Update Program</button>
+                    <button class="btn btn-outline ui-5"  onclick="closeProgramForm()">Cancel</button>
+                </div>
+            `;
+
+            let overlay = document.getElementById('program-form-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'program-form-overlay';
+                overlay.style.cssText = `
+                    position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1999;
+                `;
+                overlay.onclick = () => closeProgramForm();
+                document.body.appendChild(overlay);
+            }
+
+            let existing = document.getElementById('program-form-modal');
+            if (existing) existing.remove();
+            document.body.appendChild(modal);
+            modal.dataset.programId = id;
+            document.getElementById('prog-form-name').focus();
         }
 
         async function deleteProgram(id, name) {
@@ -7073,6 +7355,9 @@
             if (data.success) {
                 showToast(data.message || 'Program deleted.', 'success');
                 loadAdminPrograms();
+                loadCampaignsOnHomepage();
+                loadAdminDashboard();
+                loadCampaignsForDropdown();
             } else {
                 showToast(data.message || 'Error deleting program.', 'error');
             }
@@ -7822,7 +8107,7 @@
         /* ── Save admin settings ───────────────────────────────────── */
         function saveAdminSettings() {
             const panel = document.getElementById('admin-settings');
-            const inputs = panel.querySelectorAll('input');
+            const inputs = panel?.querySelectorAll('input') || [];
             const orgName = inputs[0]?.value.trim();
             const location = inputs[1]?.value.trim();
             const email = inputs[2]?.value.trim();
@@ -7835,7 +8120,6 @@
                 return;
             }
 
-            // Persist to localStorage as org settings
             const settings = {
                 orgName,
                 location,
@@ -7845,6 +8129,7 @@
                 whatsapp
             };
             localStorage.setItem('madiva_org_settings', JSON.stringify(settings));
+            applyOrgSettings(settings);
             showToast('✅ Settings saved successfully!', 'success');
         }
 
